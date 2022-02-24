@@ -1,0 +1,14 @@
+node_modules
+tsconfig.tsbuildinfo
+.serverless
+.build
+build
+_optimize
+coverage
+.coverage
+.history
+.DS_Store
+.env
+compiled-env.yml
+**/__tests__/payloads/*
+/services/estimator/app/venv/

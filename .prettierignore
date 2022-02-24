@@ -1,0 +1,17 @@
+README.md
+**/node_modules
+**/.build
+**/build
+**/_optimize
+**/package.json
+**/yarn.lock
+**/package-lock.json
+**/.eslintrc.js
+**/tsconfig.json
+**/.github
+**/.husky
+**/.vscode
+**/dist
+**/*.yml
+**/api-docs
+**/coverage

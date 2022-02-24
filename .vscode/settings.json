@@ -1,0 +1,54 @@
+{
+  "i18n-ally.localesPaths": "src/locales",
+  "i18n-ally.sourceLanguage": "en-GB",
+  "i18n-ally.displayLanguage": "en-GB",
+  "i18n-ally.enabledParsers": ["js", "json"],
+  "i18n-ally.theme.annotationBorder": "none",
+  "i18n-ally.keystyle": "nested",
+
+  "editor.formatOnSave": true,
+  "editor.wordSeparators": "`~!@#%^&*()=+[{]}\\|;:'\",.<>/?",
+  "typescript.validate.enable": true,
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "javascript.preferences.quoteStyle": "single",
+  "typescript.preferences.quoteStyle": "single",
+
+  "vetur.validation.template": false,
+  "vetur.validation.style": false,
+  "vetur.format.defaultFormatter.js": "none",
+  "vetur.format.defaultFormatter.scss": "prettier",
+  "vetur.format.defaultFormatter.html": "prettier",
+  "vetur.completion.tagCasing": "initial",
+
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "css.validate": false,
+  "scss.validate": false,
+
+  "files.eol": "\n",
+
+  "eslint.validate": ["javascript", "vue", "html"],
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+
+  "fontAwesomeAutocomplete.version": "5",
+
+  "fontAwesomeAutocomplete.patterns": ["**/*.vue"],
+
+  "fontAwesomeAutocomplete.insertionTemplate": {
+    "**/*.vue": "import {fa{name:pascalCase}} from '@fortawesome/pro-{styleName}-svg-icons';"
+  }
+}

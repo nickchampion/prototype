@@ -1,0 +1,151 @@
+service: geo
+
+frameworkVersion: '2'
+
+useDotenv: false
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  lambdaHashingVersion: 20201221
+  endpointType: REGIONAL
+  stage: ${opt:stage}
+  region: ${opt:region}
+  environment: ${file(compiled-env.yml):${opt:stage}-${opt:region}}
+  memorySize: 1024
+  timeout: 30
+  apiGateway:
+    shouldStartNameWithService: true
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'events:*'
+      Resource:
+        - '*'
+    - Effect: 'Allow'
+      Action:
+        - 'iam:PassRole'
+      Resource:
+        - 'arn:aws:iam::*:role/*'
+    - Effect: 'Allow'
+      Action:
+        - 's3:*'
+      Resource:
+        - '*'
+
+plugins:
+  - serverless-latest-layer-version
+  - serverless-plugin-typescript
+  - serverless-plugin-optimize
+  - serverless-offline-aws-eventbridge
+  - serverless-offline
+  - serverless-prune-plugin
+custom:
+  prune:
+    automatic: true
+    includeLayers: true
+    number: 3
+  serverless-offline:
+    httpPort: 3006
+    lambdaPort: 4006
+    prefix: geo
+    noPrependStageInUrl: true
+  optimize:
+    debug: false
+    minify: false
+    exclude:
+      - aws-sdk
+  serverless-offline-aws-eventbridge:
+    port: 8006 # port to run the eventBridge mock server on
+    mockEventBridgeServer: true # Set to false if EventBridge is already mocked by another stack
+    pubSubPort: 9006 # Port to run the MQ server (or just listen if using an EventBridge Mock server from another stack)
+    debug: false # flag to show debug messages
+    account: '974611314441' # account id that gets passed to the event
+    maximumRetryAttempts: 10 # maximumRetryAttempts to retry lambda
+    retryDelayMs: 500 # retry delay
+  sharedModulesLayerArn: arn:aws:lambda:${opt:region}:974611314441:layer:sm-${opt:stage}-${opt:region}:latest
+
+package:
+  individually: true
+  exclude:
+    - '**/*'
+  include:
+    - 'src/**/*.yml'
+
+functions:
+  api-v1:
+    handler: src/api/v1/handler.handler
+    layers:
+      - ${self:custom.sharedModulesLayerArn}
+    package:
+      include:
+        - src/libs/**
+        - src/api/v1/**
+    events:
+      - http:
+          path: /v1
+          method: ANY
+          cors:
+            headers:
+              - x-platform-key
+              - x-platform-key-override
+              - x-platform-secret
+              - x-platform-maintenance
+              - x-platform-location
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+      - http:
+          path: /v1/{proxy+}
+          method: ANY
+          cors:
+            headers:
+              - x-platform-key
+              - x-platform-key-override
+              - x-platform-secret
+              - x-platform-maintenance
+              - x-platform-location
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+
+  post-processors-v1:
+    handler: src/subscribers/v1/post-processors/handler.handler
+    layers:
+      - ${self:custom.sharedModulesLayerArn}
+    package:
+      include:
+        - src/libs/**
+        - src/subscribers/v1/**
+    events:
+      - eventBridge:
+          eventBus: arn:aws:events:${opt:region}:974611314441:event-bus/${file(compiled-env.yml):${opt:stage}-${opt:region}.EVENT_BUS}
+          pattern:
+            source:
+              - ${file(compiled-env.yml):${opt:stage}-${opt:region}.EVENT_SOURCE_V1}
+            detail-type:
+              - GEO_LOCATION_REGISTERED_OWNER_CHANGED
+              
+  commands-v1:
+    handler: src/subscribers/v1/commands/handler.handler
+    layers:
+      - ${self:custom.sharedModulesLayerArn}
+    package:
+      include:
+        - src/libs/**
+        - src/subscribers/v1/**
+    events:
+      - eventBridge:
+          eventBus: arn:aws:events:${opt:region}:974611314441:event-bus/${file(compiled-env.yml):${opt:stage}-${opt:region}.EVENT_BUS}
+          pattern:
+            source:
+              - ${file(compiled-env.yml):${opt:stage}-${opt:region}.EVENT_SOURCE_V1}
+            detail-type:
+              - GEO_CREATE_DIRECTIONS
+              - TR_CREATED

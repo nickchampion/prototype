@@ -1,0 +1,485 @@
+openapi: 3.0.0
+
+info:
+  description: Platform GEO capabilities.
+  title: GEO API
+  version: v1
+
+components:
+  parameters:
+    cancelled:
+      description: specify if you'd like to include cancelled records
+      in: query
+      name: cancelled
+      required: false
+      schema:
+        type: boolean
+    case:
+      description: specify if you would like to submit values in an alternate case E.g. case=camel
+      in: query
+      name: case
+      schema:
+        type: string
+    fields:
+      description: additional field filters separated by | e.g.  fields[]=is_moving|true
+      in: query
+      name: fields
+      schema:
+        type: array
+    limit:
+      description: desired items per page
+      in: query
+      name: limit
+      schema:
+        type: number
+    page:
+      description: desired page of paged response
+      in: query
+      name: page
+      schema:
+        type: number
+    record_identifier:
+      description: This is the id of the relevant component
+      in: path
+      name: id
+      required: true
+      schema:
+        $ref: '#/components/schemas/default_id'
+    search:
+      description: searches the resource for text similar to the provided string
+      in: query
+      name: search
+      schema:
+        type: string
+    select:
+      description: returns only the specified fields e.g. select fields[]=odometer
+      in: query
+      name: select
+      schema:
+        type: array
+    show_all:
+      description: specify if you'd like to include deleted records
+      in: query
+      name: show_all
+      required: false
+      schema:
+        type: boolean
+    sort_by:
+      description: name of a field to sort by
+      in: query
+      name: sort_by
+      schema:
+        type: string
+    sort_direction:
+      description: a number indicating whether to sort asc or desc
+      in: query
+      name: sort_direction
+      schema:
+        type: string
+  responses:
+    Error400:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_400_validation'
+      description: Validation failure
+    Error401:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_401_unauthorised'
+      description: Unauthorised
+    Error403:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_403_forbidden'
+      description: Forbidden
+    Error404:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_404_notfound'
+      description: Not found
+    Error500:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_500_internal'
+      description: Internal error
+    Error503:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_503_maintenance'
+      description: Maintenance mode
+  schemas:
+    route_waypoint:
+      properties:
+          distance:
+            example: 25.705
+            type: number
+          location:
+            items:
+              type: number
+            type: array
+          name:
+            example: Sutton Street
+            type: string
+      type: object
+    route_leg:
+      additionalProperties: false
+      properties:
+        admins:
+          properties:
+            iso_3166_1:
+              description: two character ISO 3166 country code
+              type: string
+            iso_3166_1_alpha3:
+              description: three character ISO 3166 country code
+              type: string
+          type: object
+        distance:
+          example: 264114.75
+          type: number
+        duration:
+          example: 10969.546
+          type: number
+        steps:
+          type: array
+        summary:
+          example: M6, Brettargh Holt Roundabout
+          type: string
+        via_waypoints:
+          items:
+            $ref: '#/components/schemas/route_waypoint'
+          type: array
+        weight:
+          example: 10704.714
+          type: number
+      type: object    
+    coordinates_array:
+      description: array of co-ordinates in order [lng, lat]
+      example:
+        - 12
+        - 12
+      minItems: 2
+      items:
+        type: number
+      type: array
+    coordinates_object:
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+      type: object
+    data_group:
+      properties:
+        created_at:
+          $ref: '#/components/schemas/default_datetime_format'
+        id:
+          $ref: '#/components/schemas/default_id'
+        name:
+          enum:
+            - SUPER
+            - ADMIN
+          type: string
+        organisation:
+          properties:
+            country:
+              properties:
+                id:
+                  $ref: '#/components/schemas/default_id'
+                iso_2:
+                  type: string
+                name:
+                  type: string
+              type: object
+            id:
+              $ref: '#/components/schemas/default_id'
+            key:
+              type: string
+            name:
+              type: string
+            profile_card:
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+              type: object
+          type: object
+        services:
+          properties:
+            billing:
+              type: number
+            default:
+              type: number
+            developer:
+              type: number
+            inventory:
+              type: number
+            logistics:
+              type: number
+            payments:
+              type: number
+            trading:
+              type: number
+          type: object
+        updated_at:
+          $ref: '#/components/schemas/default_datetime_format'
+      type: object
+    default_datetime_format:
+      format: date-time
+      type: string
+    default_flags_response:
+      example:
+        deleted: false
+      properties:
+        deleted:
+          type: boolean
+      type: object
+    default_id:
+      example: 5349b4ddd2781d08c09890f3
+      type: string
+    default_pagination:
+      properties:
+        current_document_index:
+          type: integer
+        current_page:
+          type: integer
+        limit:
+          type: integer
+        next:
+          type: integer
+        next_page_available:
+          type: boolean
+        offset:
+          type: integer
+        prev:
+          type: string
+        previous_page_available:
+          type: boolean
+        total_documents:
+          type: integer
+        total_pages:
+          type: integer
+      type: object
+    default_permissions:
+      properties:
+        billing:
+          type: integer
+        default:
+          type: integer
+        developer:
+          type: integer
+        inventory:
+          type: integer
+        logistics:
+          type: integer
+        payments:
+          type: integer
+        trading:
+          type: integer
+      type: object
+    default_success:
+      properties:
+        permissions:
+          $ref: '#/components/schemas/default_permissions'
+        status:
+          description: status indicator
+          enum:
+            - success
+            - warning
+            - error
+          type: string
+      type: object
+    default_success_list_all:
+      properties:
+        message:
+          type: string
+        pagination:
+          $ref: '#/components/schemas/default_pagination'
+        permissions:
+          $ref: '#/components/schemas/default_permissions'
+        status:
+          description: status indicator
+          enum:
+            - success
+            - warning
+            - error
+          type: string
+      type: object    
+    error_400_validation:
+      properties:
+        errors:
+          items:
+            properties:
+              field:
+                description: the field that has failed OpenApi validation
+                type: string
+              issue:
+                description: the issue that caused the field to fail OpenApi validation
+                type: string
+              message:
+                description: The 4xx message
+                type: string
+              openApiCode:
+                description: the error code of the open api error
+                type: string
+              status_code:
+                description: The response status code.
+                example: 400
+                type: number
+            required:
+              - status_code
+              - message
+            type: object
+          type: array
+        status:
+          description: status indicator
+          enum:
+            - error
+          type: string
+      type: object
+    error_401_unauthorised:
+      properties:
+        errors:
+          items:
+            properties:
+              message:
+                type: string
+              status_code:
+                enum:
+                  - 401
+                example: 401
+                type: number
+            type: object
+          type: array
+        status:
+          description: status indicator
+          enum:
+            - error
+          type: string
+      type: object
+    error_403_forbidden:
+      properties:
+        errors:
+          items:
+            properties:
+              message:
+                type: string
+              status_code:
+                enum:
+                  - 403
+                example: 403
+                type: number
+            type: object
+          type: array
+        status:
+          description: status indicator
+          enum:
+            - error
+          type: string
+      type: object
+    error_404_notfound:
+      properties:
+        errors:
+          items:
+            properties:
+              message:
+                type: string
+              status_code:
+                enum:
+                  - 404
+                example: 404
+                type: number
+            type: object
+          type: array
+        status:
+          description: status indicator
+          enum:
+            - error
+          type: string
+      type: object
+    error_500_internal:
+      properties:
+        errors:
+          items:
+            properties:
+              message:
+                type: string
+              status_code:
+                enum:
+                  - 500
+                example: 500
+                type: number
+            type: object
+          type: array
+        status:
+          description: status indicator
+          enum:
+            - error
+          type: string
+      type: object
+    error_503_maintenance:
+      properties:
+        errors:
+          items:
+            properties:
+              message:
+                type: string
+              status_code:
+                example: 503
+                type: number
+            type: object
+          type: array
+        status:
+          description: status indicator
+          enum:
+            - error
+          type: string
+      type: object
+
+paths:
+  /geo/v1/health/deep/ping:
+    $ref: health/paths.api.yml#/deep
+  /geo/v1/health/ping:
+    $ref: health/paths.api.yml#/ping
+  /geo/v1/address:
+    $ref: address/paths.api.yml#/formatted
+  /geo/v1/address/search:
+    $ref: address/paths.api.yml#/search
+  /geo/v1/country:
+    $ref: country/paths.api.yml#/getPost
+  /geo/v1/country/{id}:
+    $ref: country/paths.api.yml#/getPut
+  /geo/v1/event-control/replay/{id}:
+    $ref: geo-location/paths.api.yml#/replay_event
+  /geo/v1/location/live:
+    $ref: geo-live-location/paths.api.yml#/postGetLiveLocation
+  /geo/v1/location/live/driver/{id}:
+    $ref: geo-live-location/paths.api.yml#/getLiveLocationByDriverId
+  /geo/v1/location/live/log:
+    $ref: geo-live-location/paths.api.yml#/postGetDebugLog
+  /geo/v1/location/live/log/{id}:
+    $ref: geo-live-location/paths.api.yml#/getLog
+  /geo/v1/location/live/{id}:
+    $ref: geo-live-location/paths.api.yml#/getLiveLocation
+  /geo/v1/geo-location:
+    $ref: geo-location/paths.api.yml#/geo_location
+  /geo/v1/geo-location/{id}:
+    $ref: geo-location/paths.api.yml#/geo_location_by_id
+  /geo/v1/geo-locations/types:
+    $ref: geo-location/paths.api.yml#/types
+  /geo/v1/geo-point:
+    $ref: geo-point/paths.api.yml#/geo_point
+  /geo/v1/geo-point/{id}:
+    $ref: geo-point/paths.api.yml#/geo_point_by_id
+  /geo/v1/route/directions/{coordinates}:
+    $ref: geo-routing/paths.api.yml#/getRouteDirections
+  /geo/v1/route/distances:
+    $ref: geo-routing/paths.api.yml#/distances
+  /geo/v1/route/static/{style}/{overlay}/{params}/{size}:
+    $ref: geo-routing/paths.api.yml#/getRouteStaticImage

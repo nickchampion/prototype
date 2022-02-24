@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "antfu.vue-i18n-ally",
+    "octref.vetur",
+    "dbaeumer.vscode-eslint",
+    "wix.vscode-import-cost",
+    "dongido.sync-env",
+    "sdras.vue-vscode-snippets"
+  ]
+}
