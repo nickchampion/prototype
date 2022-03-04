@@ -1,0 +1,17 @@
+# Hectare.Platform.Components.Context
+
+## Overview
+
+The primary intention of the context component is to provide a consistent programming interface for all our business modules.
+
+This includes the following
+
+1. **Context**: A lightweight class which exposes a set of properties used by most modules. The context is initialised in one of two ways, either via the context middleware component (context/middleware/context) for APIs or via the generic event handler (context/handers/event) for events.
+2. **Session**: The session class implements a Unif of Work pattern for APIs and events. It is a wrapper around MongoDB through which all data access should flow, it provides access to the event bridge for publish
+3. **Profiler** A very basic profiler which can be used to measure code execution time and report the timings via an HTTP header for API calls
+
+## Session
+
+The session class provides access to the MongoDB API
+
+## Mongo API

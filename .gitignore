@@ -12,3 +12,4 @@ coverage
 compiled-env.yml
 **/__tests__/payloads/*
 /services/estimator/app/venv/
+overrides.json

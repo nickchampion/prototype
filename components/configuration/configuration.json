@@ -1,26 +1,95 @@
 {
-  "certificateFileName": "server",
-  "tag": {
-    "default": "dev",
-    "live": "live"
-  },
   "production": {
     "default": false,
-    "live": true
+    "prod": true
   },
   "dev": {
     "default": false,
     "dev": true
   },
+  "node_path": ".:/opt/node_modules",
+  "courier": {
+    "api_key": {
+      "encrypted": true,
+      "default": "pk_prod_N5ZHFFRTAZMY1ZQ56BZM568P001G",
+      "uat": "",
+      "sandbox": "",
+      "prod": ""
+    }
+  },
+  "redocly": {
+    "api_key": {
+      "encrypted": true,
+      "default": "orgsk_XgVvrhU5LmAWhej9PkEm4rZ1XyY=_ZxbvqXwjtfMTL24k45/m7Vs/JQ9y6cq3hVBxwVlZICQ=",
+      "uat": "",
+      "sandbox": "",
+      "prod": ""
+    }
+  },
+  "twilio": {
+    "token": {
+      "encrypted": true,
+      "default": "f544ee3907b04feb94465a7125e97192",
+      "uat": "",
+      "sandbox": "",
+      "prod": ""
+    },
+    "sid": "AC82b3bc8f5233aa41652faccbeda4e8f4"
+  },
   "slack": {
     "user": {
-      "default": "LiveCommerce Bot (Test)",
-      "live": "LiveCommerce Bot"
+      "default": "Hectare Bot (Test)",
+      "live": "Hectare Bot"
     },
     "webHook": {
       "encrypted": true,
       "default": "W0rUfjd6Yx8gs1vtispaL9SbUzX81j9c6a0gqNFgVw82Dlq7iaDVd7fWkwg7TPGZJvjmvunzvY+YiJ6V87kQxrcHhc/Oz9L6ZIhpAeLJh5DzPC/pcMoA8zciBw==",
       "live": "Br2rgqYizpmEDXa/VGGFQ9uHAVI9LtMbDqyczMv/hF49Is89WP63OFILofnI0jcMyjszYtux0Qa6z9OyiNhUKJ9H3Z5wa/2BlhSvM85bmZ6lAf4lX8JJ3qVxcQ=="
+    }
+  },
+  "aws": {
+    "eventbridge": {
+      "connection": {
+        "default": "arn:aws:events:eu-west-2:974611314441:event-bus/dev-eu-west-2.EVENT_BUS",
+        "uat": "arn:aws:events:eu-west-2:974611314441:event-bus/uat-eu-west-2.EVENT_BUS",
+        "sandbox": "arn:aws:events:eu-west-2:974611314441:event-bus/sandbox-eu-west-2.EVENT_BUS",
+        "prod": "arn:aws:events:eu-west-2:974611314441:event-bus/prod-eu-west-2.EVENT_BUS"
+      },
+      "region": "eu-west-2",
+      "port": 8006,
+      "bus": "platform-saas-events",
+      "source": {
+        "default": "dev.general.events.v1",
+        "uat": "",
+        "sandbox": "",
+        "prod": ""
+      }
+    }
+  },
+  "mongodb": {
+    "host": {
+      "default": "mongodb+srv://dev.skmdx.mongodb.net/platform?retryWrites=true&w=majority",
+      "uat": "",
+      "sandbox": "",
+      "prod": ""
+    },
+    "name": "platform",
+    "username": {
+      "default": "dev-eu-west-2",
+      "uat": "",
+      "sandbox": "sandbox-eu-west-2",
+      "prod": ""
+    },
+    "password": {
+      "encrypted": true,
+      "default": "IZN6jLcJmBNe3J2e",
+      "uat": "IFxyQMrRsPYquAmD",
+      "sandbox": "IFxyQMrRsPYquAmD",
+      "prod": "Npp74Xpp2Smb"
+    },
+    "auto_index": {
+      "default": false,
+      "dev": true
     }
   }
 }

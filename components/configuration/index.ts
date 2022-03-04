@@ -1,36 +1,16 @@
-/*
-Purpose of this component is to build a configuration object based on current environment using the 
-baseline config found in the configuration.json file in the root of the project
-
-You can have your own local overrides of this config, just create a file called configurationlocal.json 
-also in the root (this will be ignored by git).
-
-The config system can handle encrypted properties and anything sensitive should be encrypted,the properties 
-will be decrypted when we initialise the config system.
-
-Your local overrides file should look like this where the property name is a path to the config value you 
-want to replace and the property value is the replacement value
-
-{
-  "cache.prefix": "nick",
-  "database.connection": "postgres://zesttee:admin@postgres:5432/zesttee"
-}
-*/
-
 import { pbkdf2Sync, createDecipheriv } from 'crypto'
-import * as json from './configuration.json'
+import { config as json } from './config'
+import { IConfiguration } from './configuration'
 
 let config = null
-
-const env = JSON.parse(process.env.HECTARE)
 
 const settings = {
   default: 'default',
   encrypted: 'encrypted',
-  encryptionKey: env.key,
-  environment: env.stage,
-  overrides: env.overrides,
-  salt: env.salt,
+  encryptionKey: process.env.HECTARE_KEY,
+  environment: process.env.HECTARE_ENV,
+  overrides: process.env.HECTARE_OVERRIDES,
+  salt: process.env.HECTARE_SALT,
   nonce: 10,
   iv: 16
 }
@@ -116,7 +96,7 @@ const assignProperty = (parent: unknown, name: string, value: unknown) => {
   }
 }
 
-const build = (encryptionKey?: string, environment?: string) => {
+export const build = (encryptionKey?: string, environment?: string): IConfiguration => {
   const defaultEncryptionKey = settings.encryptionKey
   const defaultEnvironment = settings.environment
 
@@ -149,14 +129,13 @@ const build = (encryptionKey?: string, environment?: string) => {
     settings.environment = defaultEnvironment
   }
 
-  return configBuilder
+  return configBuilder as IConfiguration
 }
 
-const cached = () => {
+const cached = (): IConfiguration => {
   if (config !== null) return config
   config = build()
   return config
 }
 
-module.exports.config = cached()
-module.exports.build = build
+export const configuration = cached()

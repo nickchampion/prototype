@@ -1,0 +1,93 @@
+openapi: 3.0.1
+info:
+  title: 'Assets API'
+  version: 1.0.0
+schemas:
+  asset:
+    properties:
+      name:
+        type: string
+    type: object
+paths:
+  '/assets':
+    get:
+      operationId: assets_search
+      summary: Get Assets
+      description: Retrieve a list of storate assets
+      tags:
+        - assets
+      security:
+        - ApiKey: []
+          AccessToken: []
+          ApiSecret: []
+          AppOrigin: []
+      responses:
+      '200':
+        description: Successful
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/schemas/asset'
+              - $ref: '../../platform.components.common/dist/openapi.yml#/components/schemas/default_success'
+      '400':
+        $ref: '../../platform.components.common/dist/openapi.yml#/components/responses/Error400'
+      '401':
+        $ref: '../../platform.components.common/dist/openapi.yml#/components/responses/Error401'
+      '403':
+        $ref: '../../platform.components.common/dist/openapi.yml#/components/responses/Error403'
+      '500':
+        $ref: '../../platform.components.common/dist/openapi.yml#/components/responses/Error500'
+    post:
+      operationId: assets_create
+      summary: Create a new Asset
+      description: Create a new Asset
+      tags:
+        - asset
+      security:
+        - ApiKey: []
+          AccessToken: []
+          ApiSecret: []
+          AppOrigin: []
+      responses:
+      '200':
+        description: Successful
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/schemas/asset'
+              - $ref: '../../platform.components.common/dist/openapi.yml#/components/schemas/default_success_list_all'
+      '401':
+        $ref: '../../platform.components.common/dist/openapi.yml#/components/responses/Error401'
+      '403':
+        $ref: '../../platform.components.common/dist/openapi.yml#/components/responses/Error403'
+      '500':
+        $ref: '../../platform.components.common/dist/openapi.yml#/components/responses/Error500'
+  '/assets/{id}':
+    get:
+      operationId: assets_get
+      summary: Get Asset
+      description: Retrieve a storage asset by id
+      tags:
+        - asset
+      security:
+        - ApiKey: []
+          AccessToken: []
+          ApiSecret: []
+          AppOrigin: []
+      responses:
+      '200':
+        description: Successful
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/schemas/asset'
+              - $ref: '../../platform.components.common/dist/openapi.yml#/components/schemas/default_success_list_all'
+      '401':
+        $ref: '../../platform.components.common/dist/openapi.yml#/components/responses/Error401'
+      '403':
+        $ref: '../../platform.components.common/dist/openapi.yml#/components/responses/Error403'
+      '500':
+        $ref: '../../platform.components.common/dist/openapi.yml#/components/responses/Error500'

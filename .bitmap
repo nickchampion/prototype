@@ -9,29 +9,59 @@
  */
 
 {
-    "components/api": {
-        "scope": "",
-        "version": "",
-        "mainFile": "index.ts",
-        "rootDir": "components/api"
-    },
     "components/common": {
-        "scope": "",
-        "version": "",
+        "scope": "hectare.platform",
+        "version": "1.0.4",
         "mainFile": "index.ts",
         "rootDir": "components/common"
     },
     "components/configuration": {
-        "scope": "",
-        "version": "",
+        "scope": "hectare.platform",
+        "version": "1.0.4",
         "mainFile": "index.ts",
         "rootDir": "components/configuration"
     },
-    "components/db": {
-        "scope": "",
-        "version": "",
+    "components/context": {
+        "scope": "hectare.platform",
+        "version": "1.0.6",
         "mainFile": "index.ts",
-        "rootDir": "components/db"
+        "rootDir": "components/context"
+    },
+    "components/http": {
+        "scope": "hectare.platform",
+        "version": "1.0.2",
+        "mainFile": "index.ts",
+        "rootDir": "components/http"
+    },
+    "components/middleware": {
+        "scope": "hectare.platform",
+        "version": "1.0.3",
+        "mainFile": "index.ts",
+        "rootDir": "components/middleware"
+    },
+    "components/security": {
+        "scope": "hectare.platform",
+        "version": "1.0.2",
+        "mainFile": "index.ts",
+        "rootDir": "components/security"
+    },
+    "components/utils": {
+        "scope": "hectare.platform",
+        "version": "1.0.3",
+        "mainFile": "index.ts",
+        "rootDir": "components/utils"
+    },
+    "modules/inventory/assets": {
+        "scope": "hectare.platform",
+        "version": "1.0.6",
+        "mainFile": "index.ts",
+        "rootDir": "modules/inventory/assets"
+    },
+    "modules/inventory/storage": {
+        "scope": "hectare.platform",
+        "version": "1.0.1",
+        "mainFile": "index.ts",
+        "rootDir": "modules/inventory/storage"
     },
     "$schema-version": "14.9.0"
 }

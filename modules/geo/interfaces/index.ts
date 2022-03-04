@@ -1,5 +1,0 @@
-export * from './create-location'
-export * from './create-point'
-export * from './update-location'
-export * from './update-point'
-export * from './create-directions'

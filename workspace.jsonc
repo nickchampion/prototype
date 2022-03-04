@@ -10,7 +10,7 @@
     /**
      * the name of the component workspace. used for development purposes.
      **/
-    "name": "hectare-platform",
+    "name": "Hectare",
     /**
      * set the icon to be shown on the Bit server.
      **/
@@ -23,11 +23,11 @@
      * scope - scope name only, e.g. 'compilation'.
      * owner - owner name in bit.dev, e.g. 'teambit'.
      **/
-    "defaultDirectory": "{scope}/{name}",
+    "defaultDirectory": "{owner}/{name}",
     /**
      * default scope for all components in workspace.
      **/
-    "defaultScope": "hectare"
+    "defaultScope": "hectare.platform"
   },
   /**
    * main configuration for component dependency resolution.

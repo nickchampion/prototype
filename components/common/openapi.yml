@@ -1,0 +1,314 @@
+openapi: 3.0.0
+
+info:
+  description: Hectare Platform API
+  title: Platform API
+  version: v1
+
+components:
+  parameters:
+    fields:
+      description: additional field filters separated by | e.g.  fields[]=is_moving|true
+      in: query
+      name: fields
+      schema:
+        type: array
+    limit:
+      description: desired items per page
+      in: query
+      name: limit
+      schema:
+        type: number
+    page:
+      description: desired page of paged response
+      in: query
+      name: page
+      schema:
+        type: number
+    record_identifier:
+      description: This is the id of the relevant component
+      in: path
+      name: id
+      required: true
+      schema:
+        $ref: '#/components/schemas/default_id'
+    search:
+      description: searches the resource for text similar to the provided string
+      in: query
+      name: search
+      schema:
+        type: string
+    select:
+      description: returns only the specified fields e.g. select fields[]=odometer
+      in: query
+      name: select
+      schema:
+        type: array
+    show_all:
+      description: specify if you'd like to include deleted records
+      in: query
+      name: show_all
+      required: false
+      schema:
+        type: boolean
+    sort_by:
+      description: name of a field to sort by
+      in: query
+      name: sort_by
+      schema:
+        type: string
+    sort_direction:
+      description: a number indicating whether to sort asc or desc
+      in: query
+      name: sort_direction
+      schema:
+        type: string
+  responses:
+    Error400:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_400_validation'
+      description: Validation failure
+    Error401:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_401_unauthorised'
+      description: Unauthorised
+    Error403:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_403_forbidden'
+      description: Forbidden
+    Error404:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_404_notfound'
+      description: Not found
+    Error500:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_500_internal'
+      description: Internal error
+    Error503:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error_503_maintenance'
+      description: Maintenance mode
+  schemas:
+    default_datetime_format:
+      format: date-time
+      type: string
+    default_flags_response:
+      example:
+        deleted: false
+      properties:
+        deleted:
+          type: boolean
+      type: object
+    default_id:
+      example: 5349b4ddd2781d08c09890f3
+      type: string
+    default_pagination:
+      properties:
+        current_document_index:
+          type: integer
+        current_page:
+          type: integer
+        limit:
+          type: integer
+        next:
+          type: integer
+        next_page_available:
+          type: boolean
+        offset:
+          type: integer
+        prev:
+          type: string
+        previous_page_available:
+          type: boolean
+        total_documents:
+          type: integer
+        total_pages:
+          type: integer
+      type: object
+    default_permissions:
+      properties:
+        billing:
+          type: integer
+        default:
+          type: integer
+        developer:
+          type: integer
+        inventory:
+          type: integer
+        logistics:
+          type: integer
+        payments:
+          type: integer
+        trading:
+          type: integer
+      type: object
+    default_success:
+      properties:
+        permissions:
+          $ref: '#/components/schemas/default_permissions'
+        status:
+          description: status indicator
+          enum:
+            - success
+            - warning
+            - error
+          type: string
+      type: object
+    default_success_list_all:
+      properties:
+        message:
+          type: string
+        pagination:
+          $ref: '#/components/schemas/default_pagination'
+        permissions:
+          $ref: '#/components/schemas/default_permissions'
+        status:
+          description: status indicator
+          enum:
+            - success
+            - warning
+            - error
+          type: string
+      type: object    
+    error_400_validation:
+      properties:
+        errors:
+          items:
+            properties:
+              field:
+                description: the field that has failed OpenApi validation
+                type: string
+              issue:
+                description: the issue that caused the field to fail OpenApi validation
+                type: string
+              message:
+                description: The 4xx message
+                type: string
+              openApiCode:
+                description: the error code of the open api error
+                type: string
+              status_code:
+                description: The response status code.
+                example: 400
+                type: number
+            required:
+              - status_code
+              - message
+            type: object
+          type: array
+        status:
+          description: status indicator
+          enum:
+            - error
+          type: string
+      type: object
+    error_401_unauthorised:
+      properties:
+        errors:
+          items:
+            properties:
+              message:
+                type: string
+              status_code:
+                enum:
+                  - 401
+                example: 401
+                type: number
+            type: object
+          type: array
+        status:
+          description: status indicator
+          enum:
+            - error
+          type: string
+      type: object
+    error_403_forbidden:
+      properties:
+        errors:
+          items:
+            properties:
+              message:
+                type: string
+              status_code:
+                enum:
+                  - 403
+                example: 403
+                type: number
+            type: object
+          type: array
+        status:
+          description: status indicator
+          enum:
+            - error
+          type: string
+      type: object
+    error_404_notfound:
+      properties:
+        errors:
+          items:
+            properties:
+              message:
+                type: string
+              status_code:
+                enum:
+                  - 404
+                example: 404
+                type: number
+            type: object
+          type: array
+        status:
+          description: status indicator
+          enum:
+            - error
+          type: string
+      type: object
+    error_500_internal:
+      properties:
+        errors:
+          items:
+            properties:
+              message:
+                type: string
+              status_code:
+                enum:
+                  - 500
+                example: 500
+                type: number
+            type: object
+          type: array
+        status:
+          description: status indicator
+          enum:
+            - error
+          type: string
+      type: object
+    error_503_maintenance:
+      properties:
+        errors:
+          items:
+            properties:
+              message:
+                type: string
+              status_code:
+                example: 503
+                type: number
+            type: object
+          type: array
+        status:
+          description: status indicator
+          enum:
+            - error
+          type: string
+      type: object

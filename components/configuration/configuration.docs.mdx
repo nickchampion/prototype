@@ -1,0 +1,22 @@
+### Hectare.Platform.Components.Configuration Documentation
+
+## Overview
+
+Purpose of this component is to build a configuration object based on current environment using the
+baseline config found in the configuration.json file in the root of the project
+
+You can have your own local overrides of this config, just create a file called configurationlocal.json
+also in the root (this will be ignored by git).
+
+The config system can handle encrypted properties and anything sensitive should be encrypted,the properties
+will be decrypted when we initialise the config system.
+
+Your local overrides file should look like this where the property name is a path to the config value you
+want to replace and the property value is the replacement value
+
+```
+{
+  "cache.prefix": "nick",
+  "database.connection": "postgres://zesttee:admin@postgres:5432/zesttee"
+}
+```

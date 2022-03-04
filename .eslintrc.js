@@ -51,5 +51,6 @@ module.exports = {
         'endOfLine': 'auto'
       },
     ],
+    'max-len': ['error', { 'code': 175 }],
   }
 }
