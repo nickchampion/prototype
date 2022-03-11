@@ -12,9 +12,11 @@ import { context_middleware } from '..'
 /**
  * Generic handler for lambdas invoked from by the API gateway. Handlers are responsible for initialising the context
  * which provides access to the request context and database session
- * @param api
- * @param event
- * @param context
+ * @param event AWS event
+ * @param aws_context AWS context
+ * @param apis set of APIs this handler is configured to handle
+ * @param RavenDB document store to initialise the context & session
+ * @param middleware any middleware to attach to API handlers
  * @returns result of the API call
  */
 export const api_handler = async (
@@ -44,9 +46,10 @@ export const api_handler = async (
     )
   }
 
-  // set up the middleware
+  // set up the middleware, any other global midddleware should go in here
   const handler = middy(base).use(context_middleware(store))
 
+  // set up any middleware passed in by the service
   if (middleware && middleware.length) {
     middleware.forEach(m => {
       handler.use(m)
@@ -54,5 +57,5 @@ export const api_handler = async (
   }
 
   // run the handler
-  return handler(event, aws_context)
+  return await handler(event, aws_context)
 }

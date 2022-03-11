@@ -1,7 +1,8 @@
 /* eslint-disable no-param-reassign */
 import { PatchByQueryOperation, IDocumentQuery, QueryStatistics, IndexQuery, IDocumentStore } from 'ravendb'
-import { Context } from '../context'
+import { Context } from '@hectare/platform.components.context'
 import { BaseModel, Page, Query } from '@hectare/platform.components.common'
+
 class Utils {
   query<T extends BaseModel>(q: IDocumentQuery<T>): Query<T> {
     return new Query<T>(q)

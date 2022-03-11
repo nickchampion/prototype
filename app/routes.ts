@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import * as ctx from '@hectare/platform.components.context'
+import { create_document_store } from '@hectare/platform.components.ravendb'
 import { APIGatewayProxyEvent, Context as AwsContext } from 'aws-lambda'
 import * as assets from '@hectare/platform.modules.inventory.assets'
 
@@ -11,7 +12,7 @@ const models = {
   ...assets.manifest.models
 }
 
-const store = ctx.create_document_store(models)
+const store = create_document_store(models)
 
 const handler = async (req: unknown): Promise<unknown> => {
   return await ctx.api_handler(get_aws_event(req), get_aws_context(), apis, store)
@@ -49,7 +50,6 @@ export const routes = [
     method: 'DELETE',
     path: '/{path*}',
     config: {
-      description: 'Default route for delete requests',
       handler,
       auth: false
     }

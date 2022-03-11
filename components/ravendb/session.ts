@@ -1,8 +1,8 @@
 /* eslint-disable no-await-in-loop */
 import { IDocumentSession, IDocumentStore, IDocumentQuery } from 'ravendb'
-import { Context } from '../context'
 import { utils as raven_utils } from './utils'
 import * as utils from '@hectare/platform.components.utils'
+import { Context } from '@hectare/platform.components.context'
 import { ISessionAction, ISession, BaseModel, Page, Query } from '@hectare/platform.components.common'
 
 export class Session implements ISession {
@@ -10,7 +10,8 @@ export class Session implements ISession {
   private _context: Context
   private _commit_actions: ISessionAction[]
   private _rollback_actions: ISessionAction[]
-  public commit_on_get: boolean // used by get requests to indicate we want to save the session, usually we dont store anything from a get
+
+  public commit_on_get: boolean // used by get requests to indicate we want to save the session, usually we dont commit the session on a get
   public database: IDocumentSession
   public veto: boolean
 
@@ -34,14 +35,25 @@ export class Session implements ISession {
     this._commit_actions.push(action)
   }
 
+  /**
+   * Add an action which will be invoked should the session commit fail
+   * @param action
+   */
   add_rollback_action(action: ISessionAction): void {
     this._rollback_actions.push(action)
   }
 
+  /**
+   * starts a new session
+   */
   abort(): void {
     this.database = this._store.openSession()
   }
 
+  /**
+   * reset the session, often used for concurrency retry loops
+   * @param delay time in milliseconds to pause before resetting
+   */
   async reset(delay: number): Promise<void> {
     if (delay) await raven_utils.sleep(delay)
 
@@ -50,7 +62,12 @@ export class Session implements ISession {
     this._rollback_actions = []
   }
 
-  async commit(skipCommitActions = false): Promise<void> {
+  /**
+   * Commit the session and run any commit actions. If the commit fails, run any rollback actions
+   * @param skip_commit_actions skip commit actions
+   * @returns
+   */
+  async commit(skip_commit_actions = false): Promise<void> {
     if (this.veto || this.database === null) return
 
     try {
@@ -73,7 +90,7 @@ export class Session implements ISession {
       throw e
     }
 
-    if (skipCommitActions) return
+    if (skip_commit_actions) return
 
     for (const action of this._commit_actions) {
       await utils.try_execute_async(
@@ -165,12 +182,12 @@ export class Session implements ISession {
    * @param beforePatch optional function to run before we patch
    * @returns
    */
-  async patch<T extends BaseModel>(patch: Partial<T>, beforePatch: (doc: T) => Promise<void>): Promise<T> {
+  async patch<T extends BaseModel>(patch: Partial<T>, before_patch: (doc: T) => Promise<void>): Promise<T> {
     if (patch && patch.id) {
       const doc = await this.database.load<T>(patch.id)
 
       if (doc) {
-        if (beforePatch) await beforePatch(doc)
+        if (before_patch) await before_patch(doc)
         raven_utils.copy(patch, doc)
         return doc
       }
@@ -184,13 +201,13 @@ export class Session implements ISession {
    * this will automatically populate a field called user on the returned model using the userId field on the source document to find the user
    * @param id id of the document
    * @param includes any includes to return
-   * @param doNotApplyIncludes ignore any includes
+   * @param do_not_apply_includes ignore any includes
    * @returns
    */
   async get<T extends BaseModel>(
     id: string,
     includes?: Record<string, string>,
-    doNotApplyIncludes?: boolean
+    do_not_apply_includes?: boolean
   ): Promise<T> {
     let doc
 
@@ -210,7 +227,7 @@ export class Session implements ISession {
       doc = await this.database.load<T>(id)
     }
 
-    if (doc && includes && !doNotApplyIncludes) {
+    if (doc && includes && !do_not_apply_includes) {
       // we're modifying with includes so we should never be saving back to the DB after this, so evict
       this.database.advanced.evict(doc)
 
@@ -286,5 +303,3 @@ export class Session implements ISession {
     return r
   }
 }
-
-module.exports = Session

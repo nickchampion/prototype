@@ -1,5 +1,5 @@
 {
-  "include": ["services/**/*.ts", "integrations/**/*.ts", "components/**/*.ts", "modules/**/*.ts", "services/**/*.json", "integrations/**/*.json", "components/**/*.json", "modules/**/*.json", "components/context/mongodb/data.js", "components/context/mongodb/connect.js"],
+  "include": ["services/**/*.ts", "integrations/**/*.ts", "components/**/*.ts", "modules/**/*.ts", "services/**/*.json", "integrations/**/*.json", "components/**/*.json", "modules/**/*.json", "components/mongodb/data.js", "components/mongodb/connect.js"],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
 

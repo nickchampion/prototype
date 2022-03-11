@@ -1,7 +1,18 @@
 import { IDocumentStore } from 'ravendb'
-import { Session } from './ravendb/session'
+import { Session } from '@hectare/platform.components.ravendb'
 import { Profiler } from '@hectare/platform.components.utils'
 import { IEventType, IContext, ISession, IEventContext } from '@hectare/platform.components.common'
+
+export class Context implements IContext {
+  session: ISession
+  event: IEventContext
+  profiler: Profiler
+
+  public constructor(store: IDocumentStore) {
+    this.session = new Session(this, store)
+    this.profiler = new Profiler()
+  }
+}
 
 export class EventContext implements IEventContext {
   query?: { [name: string]: string | number }
@@ -23,16 +34,5 @@ export class EventContext implements IEventContext {
 
   id(): string {
     return (this.params?.id as string) || (this.query?.id as string)
-  }
-}
-
-export class Context implements IContext {
-  session: ISession
-  event: IEventContext
-  profiler: Profiler
-
-  public constructor(store: IDocumentStore) {
-    this.session = new Session(this, store)
-    this.profiler = new Profiler()
   }
 }

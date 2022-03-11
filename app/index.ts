@@ -8,16 +8,7 @@ const server = new Hapi.Server({
   routes: {
     cors: {
       origin: ['*'],
-      headers: [
-        'Authorization',
-        'Content-Type',
-        'L-Timezone-Offset',
-        'L-Profile',
-        'L-Impersonator',
-        'L-Country',
-        'L-Account',
-        'L-User'
-      ],
+      headers: ['Authorization', 'Content-Type'],
       credentials: true
     },
     validate: {

@@ -7,7 +7,7 @@ let config = null
 const settings = {
   default: 'default',
   encrypted: 'encrypted',
-  encryptionKey: process.env.HECTARE_KEY,
+  encryption_key: process.env.HECTARE_KEY,
   environment: process.env.HECTARE_ENV,
   overrides: process.env.HECTARE_OVERRIDES,
   salt: process.env.HECTARE_SALT,
@@ -39,7 +39,7 @@ const decrypt = (text: string, key: string, salt?: string) => {
   }
 }
 
-const getEnvironmentValues = (value: unknown) => {
+const get_environment_values = (value: unknown) => {
   const environments = {}
 
   Object.keys(value).forEach(prop => {
@@ -49,7 +49,7 @@ const getEnvironmentValues = (value: unknown) => {
   return environments
 }
 
-const overrideProperty = (
+const override_property = (
   configuration: unknown,
   pathParts: Array<string>,
   index: number,
@@ -58,34 +58,34 @@ const overrideProperty = (
   path: string
 ) => {
   if (typeof configuration[pathParts[index]] === 'object')
-    return overrideProperty(configuration[pathParts[index]], pathParts, index + 1, replacement, local, path)
+    return override_property(configuration[pathParts[index]], pathParts, index + 1, replacement, local, path)
 
   configuration[pathParts[index]] = replacement
   return configuration[pathParts[index]]
 }
 
-const assignProperty = (parent: unknown, name: string, value: unknown) => {
+const assign_property = (parent: unknown, name: string, value: unknown) => {
   if (Array.isArray(value)) {
     parent[name] = value
   } else if (typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, settings.default)) {
     const encrypted = Object.prototype.hasOwnProperty.call(value, settings.encrypted)
       ? value[settings.encrypted]
       : false
-    const environmentValues = getEnvironmentValues(value)
+    const environmentValues = get_environment_values(value)
     const extracted = Object.prototype.hasOwnProperty.call(environmentValues, settings.environment)
       ? environmentValues[settings.environment]
       : environmentValues[settings.default]
 
     parent[name] =
-      encrypted && extracted !== null && extracted !== '' ? decrypt(extracted, settings.encryptionKey) : extracted
+      encrypted && extracted !== null && extracted !== '' ? decrypt(extracted, settings.encryption_key) : extracted
   } else if (typeof value === 'object') {
-    // if its an object but has no key named default then we're interested in its children so recursively call assignProperty
+    // if its an object but has no key named default then we're interested in its children so recursively call assign_property
     parent[name] = {}
     Object.keys(value).forEach(prop => {
-      assignProperty(parent[name], prop, value[prop])
+      assign_property(parent[name], prop, value[prop])
     })
   } else if (value === '.env') {
-    // if the value is .env this indicates we'll read the value from the .env file
+    // if the value is .env this indicates we'll read the value from environment variables
     parent[name] = process.env[name.toUpperCase()]
   } else if (value === '.keys') {
     // if the value is .keys this indicates we'll read the value keys collection above
@@ -96,16 +96,16 @@ const assignProperty = (parent: unknown, name: string, value: unknown) => {
   }
 }
 
-export const build = (encryptionKey?: string, environment?: string): IConfiguration => {
-  const defaultEncryptionKey = settings.encryptionKey
-  const defaultEnvironment = settings.environment
+export const build = (encryption_key?: string, environment?: string): IConfiguration => {
+  const default_encryption_key = settings.encryption_key
+  const default_environment = settings.environment
 
-  if (encryptionKey) {
-    settings.encryptionKey = encryptionKey
+  if (encryption_key) {
+    settings.encryption_key = encryption_key
     settings.environment = environment
   }
 
-  // for local development look for a configuration.local.json file which will contain configuration variable overrides
+  // for local development look for an overrides file which will contain configuration variable overrides
   const local =
     settings.environment === 'dev' && settings.overrides ? tryGet(() => require(settings.overrides), {}) : {}
 
@@ -116,17 +116,17 @@ export const build = (encryptionKey?: string, environment?: string): IConfigurat
 
   // extract properties and locate the correct environment value for it
   Object.keys(json).forEach(prop => {
-    assignProperty(configBuilder, prop, json[prop])
+    assign_property(configBuilder, prop, json[prop])
   })
 
   // apply any local overrides to the config values
   Object.keys(local).forEach(path => {
-    overrideProperty(configBuilder, path.split('.'), 0, local[path], local, path)
+    override_property(configBuilder, path.split('.'), 0, local[path], local, path)
   })
 
-  if (encryptionKey) {
-    settings.encryptionKey = defaultEncryptionKey
-    settings.environment = defaultEnvironment
+  if (encryption_key) {
+    settings.encryption_key = default_encryption_key
+    settings.environment = default_environment
   }
 
   return configBuilder as IConfiguration

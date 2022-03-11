@@ -11,19 +11,19 @@
 {
     "components/common": {
         "scope": "hectare.platform",
-        "version": "1.0.4",
+        "version": "1.0.5",
         "mainFile": "index.ts",
         "rootDir": "components/common"
     },
     "components/configuration": {
         "scope": "hectare.platform",
-        "version": "1.0.4",
+        "version": "1.0.6",
         "mainFile": "index.ts",
         "rootDir": "components/configuration"
     },
     "components/context": {
         "scope": "hectare.platform",
-        "version": "1.0.6",
+        "version": "1.0.8",
         "mainFile": "index.ts",
         "rootDir": "components/context"
     },
@@ -39,6 +39,18 @@
         "mainFile": "index.ts",
         "rootDir": "components/middleware"
     },
+    "components/mongodb": {
+        "scope": "hectare.platform",
+        "version": "0.0.2",
+        "mainFile": "index.ts",
+        "rootDir": "components/mongodb"
+    },
+    "components/ravendb": {
+        "scope": "hectare.platform",
+        "version": "0.0.2",
+        "mainFile": "index.ts",
+        "rootDir": "components/ravendb"
+    },
     "components/security": {
         "scope": "hectare.platform",
         "version": "1.0.2",
@@ -47,13 +59,13 @@
     },
     "components/utils": {
         "scope": "hectare.platform",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "mainFile": "index.ts",
         "rootDir": "components/utils"
     },
     "modules/inventory/assets": {
         "scope": "hectare.platform",
-        "version": "1.0.6",
+        "version": "1.0.8",
         "mainFile": "index.ts",
         "rootDir": "modules/inventory/assets"
     },
