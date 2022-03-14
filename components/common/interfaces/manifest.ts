@@ -1,6 +1,10 @@
 import { OpenAPIBackend } from 'openapi-backend'
-import { EventHandler } from './event'
+import { IContext } from './context'
 import { ObjectTypeDescriptor } from 'ravendb'
+import { Response } from '@hectare/platform.components.http'
+
+export type EventHandler = (context: IContext) => Promise<void>
+export type ApiHandler = (context: IContext) => Promise<Response>
 
 /**
  * A manifest interface is used to specify the events, apis, models and indexes a given module exposes for services to consume

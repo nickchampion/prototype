@@ -1,5 +1,5 @@
 import { IDocumentStore } from 'ravendb'
-import { Context, EventContext } from '@hectare/platform.components.context'
+import { Context } from '@hectare/platform.components.context'
 import { EventBridgeEvent } from 'aws-lambda'
 import { event_parser } from '../parsers/event'
 

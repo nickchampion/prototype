@@ -26,12 +26,17 @@ export const patch = async (context: Context, patch: Partial<Asset>): Promise<As
   return asset
 }
 
-export const search = async (context: Context): Promise<Page<Asset>> => {
-  return await context.session.search<Asset>(
+export const search = async (context: Context): Promise<Page<AssetJson>> => {
+  const assets = await context.session.search<Asset>(
     Asset,
-    { name: context.event.query.name, type: context.event.query.type }, // fields to search on
+    context.event.parse_query(), // fields to search on
     { organisation: 'organisation_id' } // this is an include, which will set the organisation property on all assets, loaded from the referenced organisation document
   )
+
+  return {
+    ...assets,
+    results: assets.results.map(a => new AssetJson(a, a['organisation']))
+  }
 }
 
 export const create = async (context: Context): Promise<Asset> => {

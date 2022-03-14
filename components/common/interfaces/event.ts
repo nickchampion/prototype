@@ -1,5 +1,3 @@
-import { IContext } from './context'
-
 export enum IEventType {
   api,
   event
@@ -17,15 +15,13 @@ export interface IBaseEvent {
 }
 
 export interface IEventContext {
-  query?: { [name: string]: unknown }
-  params?: { [name: string]: unknown }
+  query?: Record<string, string | number>
+  params?: Record<string, string | number>
   payload?: unknown
   path?: string
   method?: string
-  headers: { [name: string]: string }
-  args: { [name: string]: unknown }
+  headers: Record<string, string>
   type: IEventType
   id(): string
+  parse_query(): Record<string, string | number>
 }
-
-export type EventHandler = (context: IContext) => Promise<void>

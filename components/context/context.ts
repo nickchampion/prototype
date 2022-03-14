@@ -2,7 +2,6 @@ import { IDocumentStore } from 'ravendb'
 import { Session } from '@hectare/platform.components.ravendb'
 import { Profiler } from './profiler'
 import { IEventType, IContext, ISession, IEventContext } from '@hectare/platform.components.common'
-import * as openapi from 'openapi-backend'
 
 export class Context implements IContext {
   session: ISession
@@ -16,13 +15,14 @@ export class Context implements IContext {
 }
 
 export class EventContext implements IEventContext {
-  query?: { [name: string]: string | number }
-  params?: { [name: string]: string | number }
+  private _ignored_query_fields = ['limit', 'offset', 'sort', 'sort_desc']
+
+  query?: Record<string, string | number>
+  params?: Record<string, string | number>
   payload?: unknown
   path?: string
   method?: string
-  headers: { [name: string]: string }
-  args: { [name: string]: unknown }
+  headers: Record<string, string>
   type: IEventType
 
   constructor(fields?: Partial<EventContext>) {
@@ -31,5 +31,15 @@ export class EventContext implements IEventContext {
 
   id(): string {
     return (this.params?.id as string) || (this.query?.id as string)
+  }
+
+  parse_query(): Record<string, string | number> {
+    const q = {}
+    Object.keys(this.query)
+      .filter(k => !this._ignored_query_fields.includes(k))
+      .forEach(k => {
+        q[k] = this.query[k]
+      })
+    return q
   }
 }

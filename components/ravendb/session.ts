@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { IDocumentSession, IDocumentStore, IDocumentQuery } from 'ravendb'
 import { utils as raven_utils } from './utils'
 import * as utils from '@hectare/platform.components.utils'
@@ -54,7 +53,7 @@ export class Session implements ISession {
    * reset the session, often used for concurrency retry loops
    * @param delay time in milliseconds to pause before resetting
    */
-  async reset(delay: number): Promise<void> {
+  async reset(delay?: number): Promise<void> {
     if (delay) await raven_utils.sleep(delay)
 
     this.database = this._store.openSession()
@@ -76,7 +75,7 @@ export class Session implements ISession {
         await this._context.profiler.measure('sc', async () => this.database.saveChanges())
       else await this.database.saveChanges()
     } catch (e) {
-      if (this._rollback_actions.length > 0) {
+      if (this._rollback_actions.length) {
         for (const action of this._rollback_actions) {
           await utils.try_execute_async(
             () => this._context.profiler.measure(action.name, async () => action.fn(this._context)),
