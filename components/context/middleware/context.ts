@@ -12,9 +12,9 @@ export const context_middleware = (
   ): Promise<void> => {
     // create our own context for this invocation and parse the request
     const context = new Context(store)
-    
+
     // parse the event using the api parser
-    context.event = api_parser(request.event);
+    context.event = api_parser(request.event)
 
     // assign our internal context to the Lambda context so we can use it in the handler
     Object.assign(request.context, {
@@ -44,8 +44,7 @@ export const context_middleware = (
     await context.session.commit()
 
     // write the profiler summary to a response header
-    if (!request.response.headers) request.response.headers = {}
-    request.response.headers['x-profiler'] = context.profiler.summary()
+    context.event.response.headers['x-profiler'] = context.profiler.summary()
   }
 
   return {

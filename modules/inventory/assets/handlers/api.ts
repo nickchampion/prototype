@@ -1,5 +1,4 @@
-import { ApiHandler } from '@hectare/platform.components.common'
-import * as http from '@hectare/platform.components.http'
+import { ApiHandler, IResponse } from '@hectare/platform.components.common'
 import * as assets from '@hectare/platform.modules.inventory.assets'
 
 /**
@@ -11,21 +10,21 @@ import * as assets from '@hectare/platform.modules.inventory.assets'
  * These handler names must match the operationId field in the paths.yml for the matching route
  */
 
-const assets_get: ApiHandler = async (context): Promise<http.Response> => {
+const assets_get: ApiHandler = async (context): Promise<IResponse> => {
   const asset = await assets.get(context)
-  if (asset) return http.status.ok(asset)
-  return http.status.not_found()
+  return asset ? context.event.response.ok(asset) : context.event.response.not_found()
 }
 
-const assets_search: ApiHandler = async (context): Promise<http.Response> => {
+const assets_search: ApiHandler = async (context): Promise<IResponse> => {
   const results = await assets.search(context)
-  if (results) return http.status.ok(results)
-  return http.status.not_found()
+  return results && results.results.length
+    ? context.event.response.ok(results)
+    : context.event.response.not_found()
 }
 
-const assets_create: ApiHandler = async (context): Promise<http.Response> => {
+const assets_create: ApiHandler = async (context): Promise<IResponse> => {
   const asset = await assets.create(context)
-  return http.status.ok(asset)
+  return asset ? context.event.response.ok(asset) : context.event.response.not_found()
 }
 
 export const api_handlers: Record<string, ApiHandler> = {

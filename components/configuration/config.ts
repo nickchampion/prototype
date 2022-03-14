@@ -43,7 +43,7 @@ export const config = {
       live: 'Hectare Bot'
     },
     webHook: {
-      encrypted: true, 
+      encrypted: true,
       default:
         'W0rUfjd6Yx8gs1vtispaL9SbUzX81j9c6a0gqNFgVw82Dlq7iaDVd7fWkwg7TPGZJvjmvunzvY+YiJ6V87kQxrcHhc/Oz9L6ZIhpAeLJh5DzPC/pcMoA8zciBw==',
       live: 'Br2rgqYizpmEDXa/VGGFQ9uHAVI9LtMbDqyczMv/hF49Is89WP63OFILofnI0jcMyjszYtux0Qa6z9OyiNhUKJ9H3Z5wa/2BlhSvM85bmZ6lAf4lX8JJ3qVxcQ=='

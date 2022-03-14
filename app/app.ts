@@ -3,6 +3,10 @@ import { create_document_store } from '@hectare/platform.components.ravendb'
 import { APIGatewayProxyEvent, Context as AwsContext } from 'aws-lambda'
 import * as assets from '@hectare/platform.modules.inventory.assets'
 
+/**
+ * App is our local web server so we can run all APIs at the same time locally
+ * To include module APIs just import the manifest and add to the apis and models objects below
+ */
 const apis = {
   assets: assets.manifest.api
 }

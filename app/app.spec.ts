@@ -4,6 +4,13 @@
 
 import * as utils from '@hectare/platform.components.utils/helpers'
 
-it('util test for running some code', () => {
-  console.log(utils.base64_encode('nick'))
+const env = {
+  key: 'F688B96E64794571854BEF2C392B9B15',
+  environment: 'dev',
+  salt: 'somethingrandom',
+  overrides: ''
+}
+
+it('test for when you just want to run some code', () => {
+  console.log(utils.base64_encode(JSON.stringify(env)))
 })

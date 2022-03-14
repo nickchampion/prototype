@@ -1,16 +1,19 @@
 import { pbkdf2Sync, createDecipheriv } from 'crypto'
 import { config as json } from './config'
 import { IConfiguration } from './configuration'
+import * as utils from '@hectare/platform.components.utils'
 
 let config = null
+
+const environment = JSON.parse(utils.base64_decode(process.env.HECTARE_DEV))
 
 const settings = {
   default: 'default',
   encrypted: 'encrypted',
-  encryption_key: process.env.HECTARE_KEY,
-  environment: process.env.HECTARE_ENV,
-  overrides: process.env.HECTARE_OVERRIDES,
-  salt: process.env.HECTARE_SALT,
+  encryption_key: environment.key,
+  environment: environment.environment,
+  overrides: environment.overrides,
+  salt: environment.salt,
   nonce: 10,
   iv: 16
 }
@@ -71,13 +74,13 @@ const assign_property = (parent: unknown, name: string, value: unknown) => {
     const encrypted = Object.prototype.hasOwnProperty.call(value, settings.encrypted)
       ? value[settings.encrypted]
       : false
-    const environmentValues = get_environment_values(value)
-    const extracted = Object.prototype.hasOwnProperty.call(environmentValues, settings.environment)
-      ? environmentValues[settings.environment]
-      : environmentValues[settings.default]
 
-    parent[name] =
-      encrypted && extracted !== null && extracted !== '' ? decrypt(extracted, settings.encryption_key) : extracted
+    const env_values = get_environment_values(value)
+    const extracted = Object.prototype.hasOwnProperty.call(env_values, settings.environment)
+      ? env_values[settings.environment]
+      : env_values[settings.default]
+
+    parent[name] = encrypted && extracted ? decrypt(extracted, settings.encryption_key) : extracted
   } else if (typeof value === 'object') {
     // if its an object but has no key named default then we're interested in its children so recursively call assign_property
     parent[name] = {}

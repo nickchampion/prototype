@@ -1,7 +1,7 @@
 import middy from '@middy/core'
 import httpErrorHandler from '@middy/http-error-handler'
 import { DocumentStore } from 'ravendb'
-import * as http from '@hectare/platform.components.http'
+import { Context } from '@hectare/platform.components.context'
 import {
   APIGatewayProxyResult,
   APIGatewayProxyEvent,
@@ -14,7 +14,7 @@ import { context_middleware } from '..'
 /**
  * Generic handler for lambdas invoked from by the API gateway. Handlers are responsible for initialising the context
  * which provides access to the request context and database session
- * 
+ *
  * The api_handler is called by services to configure the endpoints exposed by the service
  * @param event AWS event
  * @param aws_context AWS context
@@ -38,16 +38,17 @@ export const api_handler = async (
   // base handler which invokes the OpenAPIBackend API, by this point the before middleware components
   // have run, the context_middleware will add the hectare Context to the aws context which we extract below
   const base: APIGatewayProxyHandler = async (event, context) => {
-    if (!api) return http.handlers.notFound()
+    const ctx = context['context'] as Context
+    if (!api) return ctx.event.response.not_found()
     return await api.handleRequest(
       {
         method: event.requestContext.httpMethod,
         path: event.requestContext.path,
         headers: event.headers,
         query: event.queryStringParameters,
-        body: event.body,
+        body: event.body
       },
-      context['context']
+      ctx
     )
   }
 

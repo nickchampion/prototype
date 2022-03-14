@@ -1,7 +1,7 @@
 import { IDocumentStore } from 'ravendb'
 import { Session } from '@hectare/platform.components.ravendb'
 import { Profiler } from './profiler'
-import { IEventType, IContext, ISession, IEventContext } from '@hectare/platform.components.common'
+import { IEventType, IContext, ISession, IEventContext, IResponse } from '@hectare/platform.components.common'
 
 export class Context implements IContext {
   session: ISession
@@ -11,6 +11,27 @@ export class Context implements IContext {
   public constructor(store: IDocumentStore) {
     this.session = new Session(this, store)
     this.profiler = new Profiler()
+  }
+}
+
+export class Response implements IResponse {
+  headers: Record<string, string>
+  body: unknown
+  statusCode: number
+
+  constructor() {
+    this.headers = {}
+  }
+
+  ok(body: unknown): IResponse {
+    this.statusCode = 200
+    this.body = body
+    return this
+  }
+
+  not_found(): IResponse {
+    this.statusCode = 404
+    return this
   }
 }
 
@@ -24,9 +45,11 @@ export class EventContext implements IEventContext {
   method?: string
   headers: Record<string, string>
   type: IEventType
+  response: IResponse
 
   constructor(fields?: Partial<EventContext>) {
     Object.assign(this, fields)
+    this.response = new Response()
   }
 
   id(): string {

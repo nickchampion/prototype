@@ -36,11 +36,9 @@ async function start() {
 
 start()
   .then(s => {
-    // eslint-disable-next-line no-console
     console.log(`Server listening on ${s.info.uri}`)
   })
   .catch(e => {
     console.log(e)
     process.exit(1)
   })
-

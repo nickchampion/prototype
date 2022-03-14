@@ -21,7 +21,16 @@ export interface IEventContext {
   path?: string
   method?: string
   headers: Record<string, string>
+  response: IResponse
   type: IEventType
   id(): string
   parse_query(): Record<string, string | number>
+}
+
+export interface IResponse {
+  headers: Record<string, string>
+  body: unknown
+  statusCode: number
+  ok(body?: unknown): IResponse
+  not_found(): IResponse
 }
