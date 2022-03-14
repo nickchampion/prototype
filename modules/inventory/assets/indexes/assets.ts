@@ -18,10 +18,17 @@ export class Assets extends AbstractJavaScriptIndexCreationTask<Asset> {
         organisation_id: asset.organisation_id,
         organisation_name: organisation.name,
         name: asset.name,
+        location: asset.location,
         // you can combine properties into a composite field and set this as a search field, this uses
         // standard lucene analyzer (https://lucene.apache.org/core/7_3_1/core/org/apache/lucene/analysis/standard/StandardAnalyzer.html)
-        // for searching this field
-        query: [asset.name, organisation.name, organisation.id.split('/')[1], asset.id.split('/')[1]],
+        // for searching this field, non search fields need an exact match, search fields are tokenized and analyzed
+        query: [
+          asset.name,
+          asset.location,
+          organisation.name,
+          organisation.id.split('/')[1],
+          asset.id.split('/')[1]
+        ],
         patch: asset.patch
       }
     })

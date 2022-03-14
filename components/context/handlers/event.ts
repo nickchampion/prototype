@@ -1,7 +1,7 @@
 import { IDocumentStore } from 'ravendb'
 import { Context, EventContext } from '@hectare/platform.components.context'
-import { IEventType } from '@hectare/platform.components.common'
 import { EventBridgeEvent } from 'aws-lambda'
+import { event_parser } from '../parsers/event'
 
 /**
  * Generic handler for lambdas invoked from by the event bridge. Handlers are responsible for initialising the context
@@ -17,14 +17,8 @@ export const event_handler = async (
   // create our own context for this invocation and parse the request
   const context = new Context(store)
 
-  context.event = new EventContext({
-    payload: event.detail,
-    path: event['detail-type'],
-    args: {
-      event
-    },
-    type: IEventType.event
-  })
+  // parse the event bridge event
+  context.event = event_parser(event)
 
   // find the handler to run based on the event-detail
   const handler = handlers[context.event.path]
@@ -36,6 +30,9 @@ export const event_handler = async (
     await context.session.commit()
   } catch (e) {
     //TODO: logging
+    console.log(e)
+    throw e
+  } finally {
     await context.session.abort()
   }
 }

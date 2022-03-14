@@ -1,10 +1,11 @@
-import { OpenAPIBackend } from 'openapi-backend'
+import { OpenAPIBackend, Context as OpenAPIContext } from 'openapi-backend'
 import path from 'path'
 import * as models from './models'
 import * as indexes from './indexes'
 import { api_handlers } from './handlers/api'
 import { event_handlers as events } from './handlers/events'
 import { IManifest } from '@hectare/platform.components.common'
+import { Context } from '@hectare/platform.components.context'
 
 /**
  * A modules manifest defines the API routes, event handlers, models and indexes exported by this module
@@ -17,9 +18,13 @@ import { IManifest } from '@hectare/platform.components.common'
 
 const api = new OpenAPIBackend({
   definition: path.join(__dirname, './manifest.yml'),
-  quick: true,
-  handlers: api_handlers
+  handlers: api_handlers,
+  quick: true
 })
+
+// api.registerHandler("preRequestHandler", (ctx: OpenAPIContext, context: Context) => {
+  
+// })
 
 api.init()
 

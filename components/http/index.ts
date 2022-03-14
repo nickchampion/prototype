@@ -20,8 +20,8 @@ export const status = {
 }
 
 export const handlers = {
-  notFound: (c: Context<Document>): Response => {
-    if (c.request.method === 'options') {
+  notFound: (c?: Context<Document>): Response => {
+    if (c && c.request.method === 'options') {
       return status.ok()
     }
 

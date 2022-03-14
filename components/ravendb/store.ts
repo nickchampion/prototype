@@ -1,5 +1,6 @@
 import { DocumentStore, IAuthOptions, ObjectTypeDescriptor } from 'ravendb'
 import { configuration } from '@hectare/platform.components.configuration'
+import { BaseModel } from '@hectare/platform.components.common'
 
 export const create_document_store = (models: { [name: string]: ObjectTypeDescriptor }): DocumentStore => {
   const start = new Date().valueOf()
@@ -21,7 +22,7 @@ export const create_document_store = (models: { [name: string]: ObjectTypeDescri
   })
 
   store.conventions.useOptimisticConcurrency = true
-  store.conventions.findCollectionNameForObjectLiteral = (entity: any): string => entity.collection
+  store.conventions.findCollectionNameForObjectLiteral = (entity: BaseModel): string => entity['_collection']
   store.initialize()
 
   // eslint-disable-next-line no-console

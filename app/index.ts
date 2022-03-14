@@ -1,5 +1,5 @@
 import Hapi from '@hapi/hapi'
-import { routes } from './routes'
+import { handler } from './app'
 
 // create new server instance
 const server = new Hapi.Server({
@@ -20,8 +20,16 @@ const server = new Hapi.Server({
   }
 })
 
+server.route({
+  method: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  path: '/{path*}',
+  config: {
+    handler,
+    auth: false
+  }
+})
+
 async function start() {
-  server.route(routes)
   await server.start()
   return server
 }
@@ -36,4 +44,3 @@ start()
     process.exit(1)
   })
 
-module.exports = server

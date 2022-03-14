@@ -1,7 +1,8 @@
 import { IDocumentStore } from 'ravendb'
 import { Session } from '@hectare/platform.components.ravendb'
-import { Profiler } from '@hectare/platform.components.utils'
+import { Profiler } from './profiler'
 import { IEventType, IContext, ISession, IEventContext } from '@hectare/platform.components.common'
+import * as openapi from 'openapi-backend'
 
 export class Context implements IContext {
   session: ISession
@@ -26,10 +27,6 @@ export class EventContext implements IEventContext {
 
   constructor(fields?: Partial<EventContext>) {
     Object.assign(this, fields)
-  }
-
-  payload_as<T>(): T {
-    return this.payload as T
   }
 
   id(): string {

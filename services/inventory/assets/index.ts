@@ -1,5 +1,6 @@
 import { EventBridgeEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
 import 'source-map-support/register'
+import { create_document_store } from '@hectare/platform.components.ravendb'
 import * as ctx from '@hectare/platform.components.context'
 import * as assets from '@hectare/platform.modules.inventory.assets'
 
@@ -33,7 +34,7 @@ const models = {
 }
 
 // boostrap the service and get the document store used for opening sessions to RavenDB
-const store = ctx.create_document_store(models)
+const store = create_document_store(models)
 
 /**
  * Handler for all api endpoints, routes are defined in the openapi documents in each module

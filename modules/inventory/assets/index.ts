@@ -1,4 +1,5 @@
 export * from './models'
 export * from './events'
-export * from './lib'
+export * from './indexes'
+export * from './src'
 export * from './manifest'

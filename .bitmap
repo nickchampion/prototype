@@ -9,6 +9,12 @@
  */
 
 {
+    "app": {
+        "scope": "",
+        "version": "",
+        "mainFile": "index.ts",
+        "rootDir": "app"
+    },
     "components/common": {
         "scope": "hectare.platform",
         "version": "1.0.5",

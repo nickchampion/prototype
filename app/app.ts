@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import * as ctx from '@hectare/platform.components.context'
 import { create_document_store } from '@hectare/platform.components.ravendb'
 import { APIGatewayProxyEvent, Context as AwsContext } from 'aws-lambda'
@@ -14,49 +13,22 @@ const models = {
 
 const store = create_document_store(models)
 
-const handler = async (req: unknown): Promise<unknown> => {
-  return await ctx.api_handler(get_aws_event(req), get_aws_context(), apis, store)
+export const handler = async (req: unknown, reply: any): Promise<unknown> => {
+  const result = await ctx.api_handler(get_aws_event(req), get_aws_context(), apis, store)
+
+  // map the response to the Hapi response
+  const response = reply.response(result.body).code(result.statusCode)
+
+  if (result.headers) {
+    Object.assign(response.headers, result.headers)
+  }
+
+  if (!response.headers['content-type']) response.headers['content-type'] = 'application/json'
+
+  return response
 }
 
-export const routes = [
-  {
-    method: 'GET',
-    path: '/{path*}',
-    config: {
-      description: 'Default route for get requests',
-      handler,
-      auth: false
-    }
-  },
-  {
-    method: 'PUT',
-    path: '/{path*}',
-    config: {
-      description: 'Default route for put requests',
-      handler,
-      auth: false
-    }
-  },
-  {
-    method: 'POST',
-    path: '/{path*}',
-    config: {
-      description: 'Default route for post requests',
-      handler,
-      auth: false
-    }
-  },
-  {
-    method: 'DELETE',
-    path: '/{path*}',
-    config: {
-      handler,
-      auth: false
-    }
-  }
-]
-
-//#region Dummy AWS entities
+//#region Mock AWS entities
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const get_aws_context = (): AwsContext => {

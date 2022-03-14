@@ -25,7 +25,6 @@ export interface IEventContext {
   headers: { [name: string]: string }
   args: { [name: string]: unknown }
   type: IEventType
-  payload_as<T>(): T
   id(): string
 }
 

@@ -1,8 +1,8 @@
 import middy from '@middy/core'
 import { DocumentStore } from 'ravendb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { Context, EventContext } from '@hectare/platform.components.context'
-import { IEventType } from '@hectare/platform.components.common'
+import { Context } from '@hectare/platform.components.context'
+import { api_parser } from '../parsers/api'
 
 export const context_middleware = (
   store: DocumentStore
@@ -12,20 +12,9 @@ export const context_middleware = (
   ): Promise<void> => {
     // create our own context for this invocation and parse the request
     const context = new Context(store)
-
-    context.event = new EventContext({
-      query: request.event.queryStringParameters,
-      params: request.event.pathParameters,
-      payload: request.event.body,
-      path: request.event.requestContext.path,
-      method: request.event.requestContext.httpMethod.toLowerCase(),
-      headers: request.event.headers,
-      args: {
-        event: request.event,
-        context: request.context
-      },
-      type: IEventType.api
-    })
+    
+    // parse the event using the api parser
+    context.event = api_parser(request.event);
 
     // assign our internal context to the Lambda context so we can use it in the handler
     Object.assign(request.context, {
@@ -37,15 +26,15 @@ export const context_middleware = (
     request
   ): Promise<void> => {
     const context = request.context['context'] as Context
-    if (!context) return
-    await context.session.abort()
+    if (context) await context.session.abort()
   }
 
   const after: middy.MiddlewareFn<APIGatewayProxyEvent, APIGatewayProxyResult> = async (
     request
   ): Promise<void> => {
     const context = request.context['context'] as Context
-    if (!context) return
+    // dont commit the session if there was an error
+    if (!context || request.error) return
 
     // dont commit the transaction if its a get request, we should not be changing data on a get
     // but allow an override via commit_on_get on the session for exceptional circumstances
@@ -55,6 +44,7 @@ export const context_middleware = (
     await context.session.commit()
 
     // write the profiler summary to a response header
+    if (!request.response.headers) request.response.headers = {}
     request.response.headers['x-profiler'] = context.profiler.summary()
   }
 

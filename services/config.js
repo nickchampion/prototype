@@ -1,6 +1,4 @@
-// import { build as build_configuration } from './components/configuration'
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const configuration = require('@hectare/platform.components.configuration')
+import { configuration } from '@hectare/platform.components.configuration'
 
 const build = (stage, environmentKey) => {
   const env = JSON.parse(process.env[environmentKey])

@@ -173,6 +173,8 @@ export class Session implements ISession {
    * @param source instance of the model to store in the DB
    */
   async store<T extends BaseModel>(source: T): Promise<void> {
+    source.created_at = utils.utc()
+    source.updated_at = source.created_at
     await this.database.store(source)
   }
 
@@ -188,6 +190,7 @@ export class Session implements ISession {
 
       if (doc) {
         if (before_patch) await before_patch(doc)
+        doc.updated_at = utils.utc()
         raven_utils.copy(patch, doc)
         return doc
       }
@@ -200,14 +203,14 @@ export class Session implements ISession {
    * get a document from the database by ID. you can optionally pass in includes, this is a object in this format { user: 'userId' }
    * this will automatically populate a field called user on the returned model using the userId field on the source document to find the user
    * @param id id of the document
-   * @param includes any includes to return
-   * @param do_not_apply_includes ignore any includes
+   * @param includes includes load referenced documents into the current session by the path to those IDs in the source document, reducing round trips
+   * @param apply_includes if this is true the includes will be applied to a property on the model before being returned
    * @returns
    */
   async get<T extends BaseModel>(
     id: string,
     includes?: Record<string, string>,
-    do_not_apply_includes?: boolean
+    apply_includes?: boolean
   ): Promise<T> {
     let doc
 
@@ -227,11 +230,7 @@ export class Session implements ISession {
       doc = await this.database.load<T>(id)
     }
 
-    if (doc && includes && !do_not_apply_includes) {
-      // we're modifying with includes so we should never be saving back to the DB after this, so evict
-      this.database.advanced.evict(doc)
-
-      // eslint-disable-next-line no-restricted-syntax
+    if (doc && includes && apply_includes) {
       for (const key of Object.keys(includes)) {
         doc[key] = doc[includes[key]] ? await this.get(doc[includes[key]]) : null
       }
@@ -266,7 +265,7 @@ export class Session implements ISession {
   ): Promise<Page<T>> {
     let query = raven_utils.query(
       this.database.query<T>({
-        indexName: new model().index_name
+        indexName: new model().get_index_name()
       })
     )
 

@@ -1,7 +1,3 @@
-/**
- * Session
- */
-
 import mongoose from 'mongoose'
 import { connect } from './connect'
 import { Context } from '@hectare/platform.components.context'

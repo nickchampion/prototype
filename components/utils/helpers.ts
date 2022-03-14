@@ -8,6 +8,16 @@ export const copy = (source: unknown, destination: unknown, ignore: unknown[]): 
   return destination
 }
 
+export const base64_encode = (input: string): string => {
+  const buffer = Buffer.from(input, 'utf8')
+  return buffer.toString('base64')
+}
+
+export const base64_decode = (input: string): string => {
+  const buffer = Buffer.from(input, 'base64')
+  return buffer.toString('utf8')
+}
+
 export const try_execute_async = async (
   action: () => Promise<unknown>,
   errorAction: (e: unknown) => Promise<unknown>

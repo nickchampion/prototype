@@ -6,61 +6,55 @@ info:
   version: v1
 
 components:
+  paths:
+    ping:
+      get:
+        operationId: ping
+        summary: Ping a service
+        description: Ping a service
+        tags:
+          - common
+        security:
+          - ApiKey: []
+            AccessToken: []
+            ApiSecret: []
+            AppOrigin: []
+        responses:
+        '200':
+          description: Successful
+        '400':
+          $ref: '#/components/responses/Error400'
+        '500':
+          $ref: '#/components/responses/Error500'
   parameters:
-    fields:
-      description: additional field filters separated by | e.g.  fields[]=is_moving|true
-      in: query
-      name: fields
-      schema:
-        type: array
     limit:
-      description: desired items per page
-      in: query
       name: limit
+      in: query
+      description: desired items per page
       schema:
         type: number
-    page:
-      description: desired page of paged response
+    offset:
+      name: offset
       in: query
-      name: page
+      description: offset from start of results
       schema:
         type: number
-    record_identifier:
-      description: This is the id of the relevant component
-      in: path
-      name: id
-      required: true
-      schema:
-        $ref: '#/components/schemas/default_id'
-    search:
-      description: searches the resource for text similar to the provided string
+    sort_by:
+      name: sort_by
       in: query
-      name: search
+      description: name of a field to sort by
       schema:
         type: string
-    select:
-      description: returns only the specified fields e.g. select fields[]=odometer
+    sort_desc:
+      name: sort_desc
       in: query
-      name: select
-      schema:
-        type: array
-    show_all:
-      description: specify if you'd like to include deleted records
-      in: query
-      name: show_all
-      required: false
+      description: sort direction, defaults to false (ascending), set to true for descending order
       schema:
         type: boolean
-    sort_by:
-      description: name of a field to sort by
+    q:
+      name: q
       in: query
-      name: sort_by
-      schema:
-        type: string
-    sort_direction:
-      description: a number indicating whether to sort asc or desc
-      in: query
-      name: sort_direction
+      description: Free test search field for querying
       schema:
         type: string
   responses:
