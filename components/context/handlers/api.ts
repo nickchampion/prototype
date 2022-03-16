@@ -1,7 +1,7 @@
 import middy from '@middy/core'
 import httpErrorHandler from '@middy/http-error-handler'
 import { DocumentStore } from 'ravendb'
-import { Context } from '@hectare/platform.components.context'
+import { Response } from '@hectare/platform.components.common'
 import {
   APIGatewayProxyResult,
   APIGatewayProxyEvent,
@@ -9,11 +9,16 @@ import {
   Context as AwsContext
 } from 'aws-lambda'
 import { OpenAPIBackend } from 'openapi-backend'
-import { context_middleware } from '..'
+import { context_middleware, Context } from '..'
+
+/**
+ * Signature for API handlers
+ */
+export type ApiHandler = (context: Context) => Promise<Response>
 
 /**
  * Generic handler for lambdas invoked from by the API gateway. Handlers are responsible for initialising the context
- * which provides access to the request context and database session
+ * which provides access to the oncoming event and database session
  *
  * The api_handler is called by services to configure the endpoints exposed by the service
  * @param event AWS event
@@ -40,6 +45,7 @@ export const api_handler = async (
   const base: APIGatewayProxyHandler = async (event, context) => {
     const ctx = context['context'] as Context
     if (!api) return ctx.event.response.not_found()
+
     return await api.handleRequest(
       {
         method: event.requestContext.httpMethod,

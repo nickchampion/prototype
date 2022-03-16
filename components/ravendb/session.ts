@@ -1,24 +1,40 @@
 import { IDocumentSession, IDocumentStore, IDocumentQuery } from 'ravendb'
 import { utils as raven_utils } from './utils'
 import * as utils from '@hectare/platform.components.utils'
-import { Context } from '@hectare/platform.components.context'
-import { ISessionAction, ISession, BaseModel, Page, Query } from '@hectare/platform.components.common'
+import { BaseModel, Page, IProfiler, IApiModel } from '@hectare/platform.components.common'
+import { Query } from './query'
 
-export class Session implements ISession {
+/**
+ * Class used for actions to run when a session commit either fails or succeeds
+ */
+export class SessionAction {
+  fn: (session: Session) => Promise<void>
+  name: string
+
+  constructor(fn: (session: Session) => Promise<void>, name: string) {
+    this.fn = fn
+    this.name = name
+  }
+}
+
+/**
+ * Wrapper around database access scoped per event
+ */
+export class Session {
+  private _profiler: IProfiler
   private _store: IDocumentStore
-  private _context: Context
-  private _commit_actions: ISessionAction[]
-  private _rollback_actions: ISessionAction[]
+  private _commit_actions: SessionAction[]
+  private _rollback_actions: SessionAction[]
 
   public commit_on_get: boolean // used by get requests to indicate we want to save the session, usually we dont commit the session on a get
   public database: IDocumentSession
   public veto: boolean
 
-  constructor(context: Context, store: IDocumentStore) {
+  constructor(store: IDocumentStore, profiler: IProfiler) {
     this._store = store
-    this._context = context
     this._commit_actions = []
     this._rollback_actions = []
+    this._profiler = profiler
 
     this.database = store.openSession()
     this.veto = false
@@ -30,7 +46,7 @@ export class Session implements ISession {
   // 2. Perform whatever actions you need to using your new session if applicable
   // 3. do not use session.commit() as this will end up in an infinite loop, use session.database.saveChanges()
   // or session.commit(true) to skip executing the session commit actions
-  add_commit_action(action: ISessionAction): void {
+  add_commit_action(action: SessionAction): void {
     this._commit_actions.push(action)
   }
 
@@ -38,7 +54,7 @@ export class Session implements ISession {
    * Add an action which will be invoked should the session commit fail
    * @param action
    */
-  add_rollback_action(action: ISessionAction): void {
+  add_rollback_action(action: SessionAction): void {
     this._rollback_actions.push(action)
   }
 
@@ -69,38 +85,33 @@ export class Session implements ISession {
   async commit(skip_commit_actions = false): Promise<void> {
     if (this.veto || this.database === null) return
 
+    const execute_actions = async (actions: SessionAction[]) => {
+      for (const action of actions) {
+        try {
+          if (this._profiler)
+            this._profiler.measure(action.name, async () => action.fn(new Session(this._store, this._profiler)))
+          else action.fn(new Session(this._store, this._profiler))
+        } catch (e) {
+          console.log(e) //TODO: proper logging
+        }
+      }
+    }
+
     try {
       // attempt to save the session to the database
-      if (this._context && this._context.profiler)
-        await this._context.profiler.measure('sc', async () => this.database.saveChanges())
+      if (this._profiler) await this._profiler.measure('sc', async () => this.database.saveChanges())
       else await this.database.saveChanges()
     } catch (e) {
       if (this._rollback_actions.length) {
-        for (const action of this._rollback_actions) {
-          await utils.try_execute_async(
-            () => this._context.profiler.measure(action.name, async () => action.fn(this._context)),
-            error => {
-              console.log(error)
-              return null
-            }
-          )
-        }
+        execute_actions(this._rollback_actions)
       }
       throw e
     }
 
-    if (skip_commit_actions) return
+    // run any post commit actions unless explicitly specfied not to
+    if (!skip_commit_actions) execute_actions(this._commit_actions)
 
-    for (const action of this._commit_actions) {
-      await utils.try_execute_async(
-        () => this._context.profiler.measure(action.name, async () => action.fn(this._context)),
-        error => {
-          console.log(error)
-          return null
-        }
-      )
-    }
-
+    // reset
     this.database = null
     this._commit_actions = []
     this._rollback_actions = []
@@ -141,10 +152,11 @@ export class Session implements ISession {
   }
 
   /**
-   * Try to execute some code within a retry loop to handle cases where we might get concurrency issues
+   * Try to execute some code within a retry loop to handle cases where we might get concurrency exceptions
    * @param action the aaction we wish to execute
    * @param retries number of retries
    * @param delay delay in milliseconds between retries
+   * @param profiler measure the execution time
    * @returns
    */
   async try(action: () => Promise<unknown>, retries: number, delay: number): Promise<unknown> {
@@ -178,7 +190,7 @@ export class Session implements ISession {
   }
 
   /**
-   * Loads a document and updates only the fields contained in the patch input
+   * Loads a document and updates only the fields contained in the patch
    * @param patch fields on the document to update
    * @param beforePatch optional function to run before we patch
    * @returns
@@ -206,7 +218,7 @@ export class Session implements ISession {
    * @param apply_includes if this is true the includes will be applied to a property on the model before being returned
    * @returns
    */
-  async get<T extends BaseModel>(
+  async get<T extends BaseModel | IApiModel>(
     id: string,
     includes?: Record<string, string>,
     apply_includes?: boolean
@@ -252,6 +264,8 @@ export class Session implements ISession {
    * Generic handler for searching an index
    * @param model model type used to determine which index to search against
    * @param filters any filters in object notation format { name: "nick" }
+   * @param limit number of results to return
+   * @param offset offset from the beginning of the result
    * @param includes any includes to pullback with each document in the results
    * @param augment a function to augment the query for additional flexibility
    * @returns
@@ -259,6 +273,8 @@ export class Session implements ISession {
   async search<T extends BaseModel>(
     model: new () => T,
     filters: Record<string, unknown>,
+    limit = 25,
+    offset = 0,
     includes?: Record<string, string>,
     augment?: (q: Query<T>) => Query<T>
   ): Promise<Page<T>> {
@@ -284,16 +300,14 @@ export class Session implements ISession {
       query = augment(query)
     }
 
-    const r = await raven_utils.page(this._context, query.query)
+    // apply the paging settings to the query and materialise the results
+    const r = await raven_utils.page(limit, offset, query.query)
 
     // map any includes to the specified fields
     if (includes) {
       for (const result of r.results) {
-        // we're modifying with includes so we should never be saving back to the DB after this, so evict
-        this.database.advanced.evict(result)
-
         for (const key of Object.keys(includes)) {
-          result[key] = await this.get(result[includes[key]])
+          result[key] = await this.database.load<T>(result[includes[key]]) // preloaded so no round trip to db here
         }
       }
     }

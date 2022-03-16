@@ -1,17 +1,13 @@
 import { OpenAPIBackend } from 'openapi-backend'
-import { IContext } from './context'
 import { ObjectTypeDescriptor } from 'ravendb'
-import { Response } from '../types'
-
-export type EventHandler = (context: IContext) => Promise<void>
-export type ApiHandler = (context: IContext) => Promise<Response>
+import { IContext } from './context'
 
 /**
  * A manifest interface is used to specify the events, apis, models and indexes a given module exposes for services to consume
  */
 export interface IManifest {
   api: OpenAPIBackend
-  events: { [name: string]: EventHandler }
+  events: { [name: string]: (context: IContext) => Promise<void> }
   models: { [name: string]: ObjectTypeDescriptor }
   indexes: { [name: string]: ObjectTypeDescriptor }
 }

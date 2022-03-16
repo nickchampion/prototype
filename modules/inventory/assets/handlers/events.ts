@@ -1,7 +1,9 @@
-import { EventHandler } from '@hectare/platform.components.common'
+import { EventHandler } from '@hectare/platform.components.context'
+import { AssetCreatedEvent } from '../events'
 
 export const asset_created: EventHandler = async (context): Promise<void> => {
-  console.log(context.event.payload)
+  const event = context.event.payload as AssetCreatedEvent
+  console.log(event)
 }
 
 /**

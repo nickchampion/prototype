@@ -1,5 +1,11 @@
 import { configuration } from '@hectare/platform.components.configuration'
 
+/**
+ * Exposes our configuration to the serverless.yml files
+ * @param {*} stage
+ * @param {*} environmentKey
+ * @returns
+ */
 const build = (stage, environmentKey) => {
   const env = JSON.parse(process.env[environmentKey])
   const config = configuration.build(env.key, stage)

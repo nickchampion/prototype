@@ -1,6 +1,6 @@
 import { Context as OpenAPIContext } from 'openapi-backend'
-import { ApiHandler } from '@hectare/platform.components.common'
 import { Context } from '../context'
+import { ApiHandler } from '../handlers'
 
 export type OpenApiHandler = (c: OpenAPIContext, context: Context) => Promise<unknown>
 

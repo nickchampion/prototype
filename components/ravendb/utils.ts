@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { PatchByQueryOperation, IDocumentQuery, QueryStatistics, IndexQuery, IDocumentStore } from 'ravendb'
-import { Context } from '@hectare/platform.components.context'
-import { BaseModel, Page, Query } from '@hectare/platform.components.common'
+import { BaseModel, Page } from '@hectare/platform.components.common'
+import { Query } from './query'
 
 class Utils {
   query<T extends BaseModel>(q: IDocumentQuery<T>): Query<T> {
@@ -10,18 +10,16 @@ class Utils {
   async sleep(milliseconds: number): Promise<void> {
     new Promise(resolve => setTimeout(resolve, milliseconds))
   }
-  async page<T extends BaseModel>(context: Context, qry: IDocumentQuery<T>, limit = 10): Promise<Page<T>> {
+  async page<T extends BaseModel>(limit = 10, offset = 0, qry: IDocumentQuery<T>): Promise<Page<T>> {
     let stats: QueryStatistics = null
-    const count = context.event.query && context.event.query.limit ? (context.event.query.limit as number) : limit
-    const offset = context.event.query && context.event.query.offset ? (context.event.query.offset as number) : 0
 
-    const q = qry.take(count).skip(offset)
+    const q = qry.take(limit).skip(offset)
     const res = await q.statistics(s => (stats = s)).all()
 
     return {
       results: res,
       total_docs: stats.totalResults,
-      limit: count,
+      limit: limit,
       offset: offset
     }
   }

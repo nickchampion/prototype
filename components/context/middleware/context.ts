@@ -2,7 +2,7 @@ import middy from '@middy/core'
 import { DocumentStore } from 'ravendb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { Context } from '@hectare/platform.components.context'
-import { api_parser } from '../parsers/api'
+import { EventSource } from '@hectare/platform.components.common'
 
 export const context_middleware = (
   store: DocumentStore
@@ -13,8 +13,15 @@ export const context_middleware = (
     // create our own context for this invocation and parse the request
     const context = new Context(store)
 
-    // parse the event using the api parser
-    context.event = api_parser(request.event)
+    // create internal event source instance from the API gateway event
+    context.event = new EventSource({
+      query: request.event.queryStringParameters,
+      params: request.event.pathParameters,
+      payload: request.event.body,
+      path: request.event.path,
+      method: request.event.httpMethod.toLowerCase(),
+      headers: request.event.headers
+    })
 
     // assign our internal context to the Lambda context so we can use it in the handler
     Object.assign(request.context, {
@@ -37,15 +44,20 @@ export const context_middleware = (
     // dont commit the session if there was an error
     if (!context || request.error) return
 
-    // write the profiler summary to a response header
-    context.event.response.headers['x-profiler'] = context.profiler.summary()
+    const header = () => (context.event.response.headers['x-profiler'] = context.profiler.summary())
 
-    // dont commit the transaction if its a get request, we should not be changing data on a get
+    // dont commit the transaction if we're handling an http get request, we should not be changing data on a get
     // but allow an override via commit_on_get on the session for exceptional circumstances
-    if (context.event.method && context.event.method === 'get' && !context.session.commit_on_get) return
+    if (context.event.method && context.event.method === 'get' && !context.session.commit_on_get) {
+      header()
+      return
+    }
 
-    // commit the session, any database changes should be commited in within a transaction and all succeed or fail
+    // atomic commit of the session
     await context.session.commit()
+
+    // write the profiler summary to a response header
+    header()
   }
 
   return {

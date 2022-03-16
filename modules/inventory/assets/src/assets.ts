@@ -1,14 +1,14 @@
 import { Context } from '@hectare/platform.components.context'
-import { Page, Organisation } from '@hectare/platform.components.common'
+import { Page } from '@hectare/platform.components.common'
 import { Asset } from '../models'
-import { AssetJson } from '../json'
+import { AssetJson, OrganisationJson } from '../json'
 
 export const get = async (context: Context): Promise<AssetJson> => {
   // returns the asset with the organisation field set by the include specified below
   const asset = await context.session.get<Asset>(Asset.id(context.event.id()), { organisation: 'organisation_id' })
 
   // this will not result in a round trip to the database as we pre-fetched organisation document into the session with the previous get
-  const organisation = await context.session.get<Organisation>(asset.organisation_id)
+  const organisation = await context.session.get<OrganisationJson>(asset.organisation_id)
 
   // create and return the json representation of the asset
   return new AssetJson(asset, organisation)
@@ -29,7 +29,9 @@ export const patch = async (context: Context, patch: Partial<Asset>): Promise<As
 export const search = async (context: Context): Promise<Page<AssetJson>> => {
   const assets = await context.session.search<Asset>(
     Asset,
-    context.event.parse_query(), // fields to search on
+    context.event.parse_query(),
+    context.event.limit(context.configuration.defaults.page_size),
+    context.event.offset(),
     { organisation: 'organisation_id' } // this is an include, which will set the organisation property on all assets, loaded from the referenced organisation document
   )
 

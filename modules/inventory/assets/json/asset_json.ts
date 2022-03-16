@@ -1,7 +1,7 @@
 import { AssetLocation, Asset } from '../models/asset'
-import { Organisation } from '@hectare/platform.components.common'
+import { IApiModel } from '@hectare/platform.components.common'
 
-export interface IOrganisationJson {
+export class OrganisationJson implements IApiModel {
   id: string
   name: string
 }
@@ -10,21 +10,19 @@ export interface IOrganisationJson {
  * AssetJson is the asset representation returned from the API, gives us flexibility over the data we expose
  * Should be described in the manifest.yml
  */
-export class AssetJson {
+export class AssetJson implements IApiModel {
   id: string
   name: string
-  organisation_id: string
-  organisation: IOrganisationJson
+  organisation: OrganisationJson
   location: AssetLocation
   asset_types: string[]
   weight_kg: number
   volume_cubic_m: number
 
-  constructor(asset: Asset, organisation?: Partial<Organisation>) {
+  constructor(asset: Asset, organisation?: Partial<OrganisationJson>) {
     Object.assign(this, asset)
 
     this.id = Asset.friendly_id(this.id)
-    this.organisation_id = Asset.friendly_id(this.organisation_id)
 
     this.organisation = {
       name: organisation?.name,

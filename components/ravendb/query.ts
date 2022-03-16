@@ -1,5 +1,5 @@
 import { IDocumentQuery } from 'ravendb'
-import { BaseModel } from './base_model'
+import { BaseModel } from '@hectare/platform.components.common'
 
 export class Query<T extends BaseModel> {
   private _hasFilter = false

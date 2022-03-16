@@ -1,10 +1,9 @@
 import { pbkdf2Sync, createDecipheriv } from 'crypto'
-import { config as json } from './config'
-import { IConfiguration } from './configuration'
+import { configuration as baseline } from './configuration'
+import { IConfiguration } from './types/configuration'
 import * as utils from '@hectare/platform.components.utils'
 
-let config = null
-
+let cached_configuration = null
 const environment = JSON.parse(utils.base64_decode(process.env.HECTARE_DEV))
 
 const settings = {
@@ -113,18 +112,18 @@ export const build = (encryption_key?: string, environment?: string): IConfigura
     settings.environment === 'dev' && settings.overrides ? tryGet(() => require(settings.overrides), {}) : {}
 
   // config object we'll build
-  const configBuilder = {
+  const builder = {
     environment
   }
 
   // extract properties and locate the correct environment value for it
-  Object.keys(json).forEach(prop => {
-    assign_property(configBuilder, prop, json[prop])
+  Object.keys(baseline).forEach(prop => {
+    assign_property(builder, prop, baseline[prop])
   })
 
   // apply any local overrides to the config values
   Object.keys(local).forEach(path => {
-    override_property(configBuilder, path.split('.'), 0, local[path], local, path)
+    override_property(builder, path.split('.'), 0, local[path], local, path)
   })
 
   if (encryption_key) {
@@ -132,13 +131,14 @@ export const build = (encryption_key?: string, environment?: string): IConfigura
     settings.environment = default_environment
   }
 
-  return configBuilder as IConfiguration
+  return builder as IConfiguration
 }
 
 export const cached = (): IConfiguration => {
-  if (config !== null) return config
-  config = build()
-  return config
+  if (cached_configuration !== null) return cached_configuration
+  cached_configuration = build()
+  return cached_configuration
 }
 
 export const configuration = cached()
+export { IConfiguration } from './types/configuration'

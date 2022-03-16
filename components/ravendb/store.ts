@@ -17,15 +17,18 @@ export const create_document_store = (models: { [name: string]: ObjectTypeDescri
     auth_options
   )
 
+  // By registering our models with the document store RavenDB will know to track these entities when used within a session
   Object.keys(models).forEach(key => {
     store.conventions.registerEntityType(models[key])
   })
 
+  // Will throw ConcurrencyError is we attempt to update a document that was updated since we loaded it
+  // RavenDB does not use locking, so there may be occasions when we need to handle concurrency exceptions
   store.conventions.useOptimisticConcurrency = true
-  store.conventions.findCollectionNameForObjectLiteral = (entity: BaseModel): string => entity['_collection']
+  // This allows us to identofy the collection documents belong to by reading the private #collection field
+  store.conventions.findCollectionNameForObjectLiteral = (entity: BaseModel): string => entity['#collection']
   store.initialize()
 
-  // eslint-disable-next-line no-console
   console.log(
     `RavenDB: Successfully connected to ${configuration.ravendb.endpoints.join(',')}:${
       configuration.ravendb.database_name
