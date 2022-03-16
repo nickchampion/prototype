@@ -10,6 +10,7 @@ export interface IConfiguration {
   aws: IAws
   mongo: IMongoDB
   ravendb: IRavenDB
+  modules: Record<string, unknown>
 }
 
 export interface IRavenDB {

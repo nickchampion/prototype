@@ -16,7 +16,7 @@
     "clean": "rm -rf build",
     "compile": "tsc -p tsconfig.build.json",
     "build": "npm run clean && npm run compile",
-    "dev": "ts-node-dev --inspect=0.0.0.0:9001 --respawn --transpile-only --watch components,app,integrations,modules app/index.ts",
+    "dev": "ts-node-dev --inspect=0.0.0.0:9001 --debug --respawn --transpile-only --watch components,app,integrations,modules app/index.ts",
     "start": "serverless offline start --stage dev"
   },
   "dependencies": {
@@ -28,22 +28,22 @@
     "ravendb": "5.2.0"
   },
   "devDependencies": {
-    "@types/aws-lambda": "8.10.93",
-    "@types/jest": "27.4.1",
-    "@typescript-eslint/eslint-plugin": "5.14.0",
-    "@typescript-eslint/parser": "5.14.0",
-    "eslint": "8.11.0",
-    "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-import": "2.25.4",
-    "eslint-plugin-jest": "26.1.1",
-    "eslint-plugin-json": "3.1.0",
-    "eslint-plugin-prettier": "4.0.0",
-    "jest": "27.5.1",
-    "prettier": "2.5.1",
-    "prettier-eslint": "13.0.0",
-    "pretty-quick": "3.1.3",
-    "source-map-support": "0.5.21",
-    "ts-node-dev": "1.1.8",
-    "typescript": "4.6.2"
+    "@types/aws-lambda": "^8.10.93",
+    "@types/jest": "^27.4.1",
+    "@typescript-eslint/eslint-plugin": "^5.14.0",
+    "@typescript-eslint/parser": "^5.14.0",
+    "eslint": "^8.11.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jest": "^26.1.1",
+    "eslint-plugin-json": "^3.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^27.5.1",
+    "prettier": "^2.5.1",
+    "prettier-eslint": "^13.0.0",
+    "pretty-quick": "^3.1.3",
+    "source-map-support": "^0.5.21",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.6.2"
   }
 }

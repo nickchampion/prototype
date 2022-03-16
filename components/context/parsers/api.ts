@@ -1,5 +1,4 @@
-import { EventContext } from '@hectare/platform.components.context'
-import { IEventType } from '@hectare/platform.components.common'
+import { IEventType, EventContext } from '@hectare/platform.components.common'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 
 export const api_parser = (request: APIGatewayProxyEvent): EventContext => {
@@ -11,5 +10,5 @@ export const api_parser = (request: APIGatewayProxyEvent): EventContext => {
     method: request.httpMethod.toLowerCase(),
     headers: request.headers,
     type: IEventType.api
-  });
+  })
 }

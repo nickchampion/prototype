@@ -19,6 +19,7 @@ const store = create_document_store(models)
 
 export const handler = async (req: unknown, reply: any): Promise<unknown> => {
   const result = await ctx.api_handler(get_aws_event(req), get_aws_context(), apis, store)
+  console.log(result)
 
   // map the response to the Hapi response
   const response = reply.response(result.body).code(result.statusCode)

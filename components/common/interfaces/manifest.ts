@@ -1,7 +1,7 @@
 import { OpenAPIBackend } from 'openapi-backend'
 import { IContext } from './context'
 import { ObjectTypeDescriptor } from 'ravendb'
-import { Response } from '@hectare/platform.components.http'
+import { Response } from '../types'
 
 export type EventHandler = (context: IContext) => Promise<void>
 export type ApiHandler = (context: IContext) => Promise<Response>

@@ -33,8 +33,12 @@ export const context_middleware = (
     request
   ): Promise<void> => {
     const context = request.context['context'] as Context
+
     // dont commit the session if there was an error
     if (!context || request.error) return
+
+    // write the profiler summary to a response header
+    context.event.response.headers['x-profiler'] = context.profiler.summary()
 
     // dont commit the transaction if its a get request, we should not be changing data on a get
     // but allow an override via commit_on_get on the session for exceptional circumstances
@@ -42,9 +46,6 @@ export const context_middleware = (
 
     // commit the session, any database changes should be commited in within a transaction and all succeed or fail
     await context.session.commit()
-
-    // write the profiler summary to a response header
-    context.event.response.headers['x-profiler'] = context.profiler.summary()
   }
 
   return {

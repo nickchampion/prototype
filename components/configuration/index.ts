@@ -135,7 +135,7 @@ export const build = (encryption_key?: string, environment?: string): IConfigura
   return configBuilder as IConfiguration
 }
 
-const cached = (): IConfiguration => {
+export const cached = (): IConfiguration => {
   if (config !== null) return config
   config = build()
   return config

@@ -5,14 +5,16 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Attach",
+      "port": 9001,
+      "request": "attach",
+      "type": "pwa-node"
+    },
+    {
       "type": "node",
       "request": "attach",
       "name": "Debug",
-      "protocol": "inspector",
       "port": 9001,
-      "restart": true,
-      "localRoot": "${workspaceFolder}",
-      "remoteRoot": "."
     }
   ]
 }

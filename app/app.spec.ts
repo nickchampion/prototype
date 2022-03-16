@@ -2,7 +2,7 @@
  * Sometimes you just want to run some code to test something, use "bit test app" to run this test
  */
 
-import * as utils from '@hectare/platform.components.utils/helpers'
+import * as utils from '@hectare/platform.components.utils'
 
 const env = {
   key: 'F688B96E64794571854BEF2C392B9B15',
