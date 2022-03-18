@@ -11,7 +11,7 @@ const settings = {
   encrypted: 'encrypted',
   encryption_key: environment.key,
   environment: environment.environment,
-  overrides: environment.overrides,
+  overrides: process.env.HECTARE_DEV_OVERRIDES,
   salt: environment.salt,
   nonce: 10,
   iv: 16

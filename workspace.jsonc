@@ -38,7 +38,10 @@
      */
     "packageManager": "teambit.dependencies/pnpm",
     "policy": {
-      "dependencies": {},
+      "dependencies": {
+        "@types/express": "4.17.13",
+        "express": "4.17.2"
+      },
       "peerDependencies": {}
     }
   },
@@ -58,6 +61,9 @@
        * uncomment to apply the chosen environment on all components.
        **/
       // "teambit.react/react": { }
+    },
+    "{content/**}": {
+      "teambit.mdx/mdx": {}
     }
   }
 }

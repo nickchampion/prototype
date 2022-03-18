@@ -1,22 +1,71 @@
-### Hectare.Platform.Components.Configuration Documentation
+---
+displayName: 'Configuration'
+description: 'Application configuration component'
+labels: ['components', 'configuration']
+---
 
 ## Overview
 
 Purpose of this component is to build a configuration object based on current environment using the
-baseline config found in the configuration.json file in the root of the project
+baseline config found in the configuration.ts file in the root of the project
 
-You can have your own local overrides of this config, just create a file called configurationlocal.json
-also in the root (this will be ignored by git).
+The configuration system requires two environment variables in order to materialise the configuration with
+settings for the appropriate environment.
 
-The config system can handle encrypted properties and anything sensitive should be encrypted,the properties
-will be decrypted when we initialise the config system.
+Please add this environment variable for development environments
+
+```js
+export HECTARE_DEV="eyJrZXkiOiJGNjg4Qjk2RTY0Nzk0NTcxODU0QkVGMkMzOTJCOUIxNSIsImVudmlyb25tZW50IjoiZGV2Iiwic2FsdCI6InNvbWV0aGluZ3JhbmRvbSIsIm92ZXJyaWRlcyI6IiJ9"
+```
+
+If you have local overides you need to add this environment variable which is a pointer to the override file
+
+```js
+export HECTARE_DEV_OVERRIDES="/Users/nchampion/Dev/Repositories/config_overides.json"
+```
 
 Your local overrides file should look like this where the property name is a path to the config value you
 want to replace and the property value is the replacement value
 
-```
+```js
 {
   "cache.prefix": "nick",
-  "database.connection": "postgres://zesttee:admin@postgres:5432/zesttee"
+  "database.connection": "postgres://hectare:admin@postgres:5432/hectare"
 }
 ```
+
+Configuration is JSON, example as follows
+
+```js
+export const configuration = {
+  production: {
+    default: false,
+    prod: true
+  },
+  dev: {
+    default: false,
+    dev: true
+  },
+  defaults: {
+    page_size: 25
+  },
+  node_path: '.:/opt/node_modules',
+  courier: {
+    api_key: {
+      encrypted: true,
+      default: 'pk_prod_N5ZHFFRTAZMY1ZQ56BZM568P001G',
+      uat: '',
+      sandbox: '',
+      prod: ''
+    }
+  }
+}
+```
+
+In the above example each configuration property can have a different value for each environment or can always have the same value (node_path in the above will be the same value for all environments).
+
+The configuration system supports encryption of properties if needed, to enable encryption you need to add the "encrypted" key as in the courier.api_key field above. The configuration is initialised once when the process starts and uses environment variables to determine which environment we're in and which encryption key and salt to use for decryption.
+
+You can have default values, so if all environments except prod for example have the same value, you can set the default key to this value and just add a live key for the live setting (see the dev key for an example of this approach above) which helps to minimise configuration.
+
+All properties that need to specify different values for each environment must include the "default" key, this is used to indicate the property is a config property not a parent object such as the courier property in the above example.

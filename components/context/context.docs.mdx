@@ -1,17 +1,22 @@
-# Hectare.Platform.Components.Context
+---
+displayName: 'Context'
+description: 'Common interface for all business modules'
+labels: ['components', 'context']
+---
 
 ## Overview
 
-The primary intention of the context component is to provide a consistent programming interface for all our business modules.
+Modules should be unaware of the execution context within which they are run, they should have no dependencies on AWS Lambda, Express or any other infrastructure specifics. The intention therefore of the context component is to provide a consistent programming interface that all our business modules use, which creates an abstraction over the execution context.
 
-This includes the following
+Context is a lightweight class which exposes a set of properties used by most modules. The context is initialised in one of two ways, either via the context middleware component (context/middleware/context.ts) for APIs or via the generic event handler (context/handers/event.ts) for events.
 
-1. **Context**: A lightweight class which exposes a set of properties used by most modules. The context is initialised in one of two ways, either via the context middleware component (context/middleware/context) for APIs or via the generic event handler (context/handers/event) for events.
-2. **Session**: The session class implements a Unif of Work pattern for APIs and events. It is a wrapper around MongoDB through which all data access should flow, it provides access to the event bridge for publish
+Currently context contains 4 properties
+
+1. **Event**: A lightweight class which exposes a set of properties used by most modules. The context is initialised in one of two ways, either via the context middleware component (components/context/middleware/context.ts) for APIs or via the generic event handler (components/context/handers/event.ts) for events.
+2. **Session**: Provides access to the current database session which is scoped per api request or per event.
 3. **Profiler** A very basic profiler which can be used to measure code execution time and report the timings via an HTTP header for API calls
+4. **Configuration** Convenient accessor to the application configuration
 
-## Session
+Having this high degree of consistency across all our code will make change much simpler.
 
-The session class provides access to the MongoDB API
-
-## Mongo API
+We have generic event and api handlers (components/context/handlers/api.ts & components/context/handlers/event.ts) that process incoming events by initializing the context & session, mapping the incoming request / event payload to our own internal event context and then routing the event to the correct handler.
