@@ -7,7 +7,7 @@ labels: ['components', 'configuration']
 ## Overview
 
 Purpose of this component is to build a configuration object based on current environment using the
-baseline config found in the configuration.ts file in the root of the project
+baseline config found in the configuration.ts file in the root of this component
 
 The configuration system requires two environment variables in order to materialise the configuration with
 settings for the appropriate environment.
@@ -15,10 +15,10 @@ settings for the appropriate environment.
 Please add this environment variable for development environments
 
 ```js
-export HECTARE_DEV="eyJrZXkiOiJGNjg4Qjk2RTY0Nzk0NTcxODU0QkVGMkMzOTJCOUIxNSIsImVudmlyb25tZW50IjoiZGV2Iiwic2FsdCI6InNvbWV0aGluZ3JhbmRvbSIsIm92ZXJyaWRlcyI6IiJ9"
+export HECTARE_DEV="eyJrZXkiOiJGNjg4Qjk2RTY0Nzk0NTcxODU0QkVGMkMzOTJCOUIxNSIsImVudmlyb25tZW50IjoiZGV2Iiwic2FsdCI6InNvbWV0aGluZ3JhbmRvbSJ9"
 ```
 
-If you have local overides you need to add this environment variable which is a pointer to the override file
+If you have local overides you need to add this environment variable which is a pointer to the override file on your local
 
 ```js
 export HECTARE_DEV_OVERRIDES="/Users/nchampion/Dev/Repositories/config_overides.json"
@@ -53,10 +53,10 @@ export const configuration = {
   courier: {
     api_key: {
       encrypted: true,
-      default: 'pk_prod_N5ZHFFRTAZMY1ZQ56BZM568P001G',
-      uat: '',
-      sandbox: '',
-      prod: ''
+      default: 'CymtbB6Al/lD5z01Nfzp1SKzTj2F0A==',
+      uat: '0m1pNGQiDYn5YmrY1NHMZ/xPeIubJXF2J/sV+0irIw==',
+      sandbox: 'CymtbBAl/lD5z01NfzSKzTj2F0A==',
+      prod: '0m1pNGQiDY8Sn5YmrY1NHMZ/xPeIuiwbJXF2J/sV+0irIw=='
     }
   }
 }

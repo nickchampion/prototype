@@ -1,8 +1,8 @@
-import { IDocumentSession, IDocumentStore, IDocumentQuery } from 'ravendb'
+import { IDocumentSession, IDocumentStore, IDocumentQuery, QueryStatistics } from 'ravendb'
 import { utils as raven_utils } from './utils'
 import * as utils from '@hectare/platform.components.utils'
 import { BaseModel, Page, IProfiler, IApiModel } from '@hectare/platform.components.common'
-import { Query } from './query'
+import { QuerySettings, SearchOperator } from '@hectare/platform.components.common'
 
 /**
  * Class used for actions to run when a session commit either fails or succeeds
@@ -260,6 +260,26 @@ export class Session {
     await this.database.delete<T>(doc)
   }
 
+  async query<T extends BaseModel>(
+    model: new () => T,
+    fn: (q: IDocumentQuery<T>) => IDocumentQuery<T>
+  ): Promise<Page<T>> {
+    const q = fn(
+      this.database.query<T>({
+        indexName: new model().get_index_name()
+      })
+    )
+
+    let stats: QueryStatistics = null
+    const res = await q.statistics(s => (stats = s)).all()
+
+    return {
+      results: res,
+      total_docs: stats.totalResults,
+      elasped: stats.durationInMs
+    }
+  }
+
   /**
    * Generic handler for searching an index
    * @param model model type used to determine which index to search against
@@ -272,21 +292,30 @@ export class Session {
    */
   async search<T extends BaseModel>(
     model: new () => T,
-    filters: Record<string, unknown>,
-    limit = 25,
-    offset = 0,
+    settings?: QuerySettings,
     includes?: Record<string, string>,
-    augment?: (q: Query<T>) => Query<T>
+    augment?: (q: IDocumentQuery<T>) => IDocumentQuery<T>
   ): Promise<Page<T>> {
-    let query = raven_utils.query(
-      this.database.query<T>({
-        indexName: new model().get_index_name()
-      })
-    )
+    let query = this.database.query<T>({
+      indexName: new model().get_index_name()
+    })
 
-    if (filters) {
-      Object.keys(filters).forEach(key => {
-        query = query.whereEquals(key, filters[key])
+    // ensure we use the correct operator, defaults to AND
+    query =
+      settings.operator === SearchOperator.And
+        ? query.usingDefaultOperator('AND')
+        : query.usingDefaultOperator('OR')
+
+    if (settings.filters) {
+      Object.keys(settings.filters).forEach(key => {
+        const negate = settings.filters[key][0] === '-'
+        const value = negate ? settings.filters[key].toString().substr(1) : settings.filters[key].toString()
+
+        if (value.indexOf(',') >= 0) {
+          query = negate ? query.not().whereIn(key, value.split(',')) : query.whereIn(key, value.split(','))
+        } else {
+          query = negate ? query.whereNotEquals(key, value) : query.whereEquals(key, value)
+        }
       })
     }
 
@@ -300,8 +329,12 @@ export class Session {
       query = augment(query)
     }
 
+    if (settings.sort) {
+      query = settings.sort_desc ? query.orderByDescending(settings.sort) : query.orderBy(settings.sort)
+    }
+
     // apply the paging settings to the query and materialise the results
-    const r = await raven_utils.page(limit, offset, query.query)
+    const r = await raven_utils.page(settings.limit, settings.offset, query)
 
     // map any includes to the specified fields
     if (includes) {

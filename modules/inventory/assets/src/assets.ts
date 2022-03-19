@@ -29,9 +29,7 @@ export const patch = async (context: Context, patch: Partial<Asset>): Promise<As
 export const search = async (context: Context): Promise<Page<AssetJson>> => {
   const assets = await context.session.search<Asset>(
     Asset,
-    context.event.parse_query(),
-    context.event.limit(context.configuration.defaults.page_size),
-    context.event.offset(),
+    context.event.get_query_settings(context.configuration.defaults.page_size),
     { organisation: 'organisation_id' } // this is an include, which will set the organisation property on all assets, loaded from the referenced organisation document
   )
 

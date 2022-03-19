@@ -1,15 +1,25 @@
 import { Response } from './response'
+import { QuerySettings } from './query_settings'
 
 const ignored_fields = ['limit', 'offset', 'sort', 'sort_desc']
 
+export enum EventSourceType {
+  Http,
+  Event
+}
+
+/**
+ * Representation of an event that triggered whatever code is currently executing
+ */
 export class EventSource {
   public path: string
   public payload?: unknown
-  public query?: Record<string, string | number>
+  public query?: Record<string, string | number | boolean>
   public params?: Record<string, string | string[]>
   public method?: string
   public headers?: Record<string, string>
   public response?: Response
+  public type: EventSourceType
 
   constructor(fields?: Partial<EventSource>) {
     Object.assign(this, fields)
@@ -24,20 +34,20 @@ export class EventSource {
     )
   }
 
-  public parse_query(): Record<string, string | number> {
-    return Object.keys(this.query)
+  public get_query_settings(limit = 25): QuerySettings {
+    const filters = Object.keys(this.query || {})
       .filter(k => !ignored_fields.includes(k))
       .reduce((obj, key) => {
         obj[key] = this.query[key]
         return obj
       }, {})
-  }
 
-  public limit(def = 25): number {
-    return (this.query?.limit as number) || def
-  }
-
-  public offset(): number {
-    return (this.query?.offset as number) || 0
+    return new QuerySettings({
+      limit: (this.query?.limit as number) || limit,
+      offset: (this.query?.offset as number) || 0,
+      sort: this.query?.sort as string,
+      sort_desc: this.query?.sort_desc as boolean,
+      filters: filters
+    })
   }
 }

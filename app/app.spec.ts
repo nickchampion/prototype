@@ -7,8 +7,7 @@ import * as utils from '@hectare/platform.components.utils'
 const env = {
   key: 'F688B96E64794571854BEF2C392B9B15',
   environment: 'dev',
-  salt: 'somethingrandom',
-  overrides: ''
+  salt: 'somethingrandom'
 }
 
 it('test for when you just want to run some code', () => {

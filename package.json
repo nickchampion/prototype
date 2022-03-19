@@ -16,7 +16,7 @@
     "clean": "rm -rf build",
     "compile": "tsc -p tsconfig.build.json",
     "build": "npm run clean && npm run compile",
-    "dev": "ts-node-dev --inspect=0.0.0.0:9001 --debug --respawn --transpile-only --watch components,app,integrations,modules app/index.ts",
+    "dev": "ts-node-dev --inspect=0.0.0.0:9001 --debug --respawn --transpile-only app/index.ts",
     "start": "serverless offline start --stage dev"
   },
   "dependencies": {

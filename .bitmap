@@ -11,7 +11,7 @@
 {
     "app": {
         "scope": "hectare.platform",
-        "version": "0.0.7",
+        "version": "0.0.8",
         "mainFile": "index.ts",
         "rootDir": "app"
     },
@@ -23,25 +23,25 @@
     },
     "components/configuration": {
         "scope": "hectare.platform",
-        "version": "1.0.12",
+        "version": "1.1.0",
         "mainFile": "index.ts",
         "rootDir": "components/configuration"
     },
     "components/context": {
         "scope": "hectare.platform",
-        "version": "1.0.15",
+        "version": "1.0.16",
         "mainFile": "index.ts",
         "rootDir": "components/context"
     },
     "components/mongodb": {
         "scope": "hectare.platform",
-        "version": "0.0.9",
+        "version": "0.0.10",
         "mainFile": "index.ts",
         "rootDir": "components/mongodb"
     },
     "components/ravendb": {
         "scope": "hectare.platform",
-        "version": "0.0.8",
+        "version": "0.0.9",
         "mainFile": "index.ts",
         "rootDir": "components/ravendb"
     },
@@ -59,7 +59,7 @@
     },
     "modules/inventory/assets": {
         "scope": "hectare.platform",
-        "version": "1.0.15",
+        "version": "1.0.16",
         "mainFile": "index.ts",
         "rootDir": "modules/inventory/assets"
     },

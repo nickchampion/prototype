@@ -2,7 +2,7 @@ import middy from '@middy/core'
 import { DocumentStore } from 'ravendb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { Context } from '@hectare/platform.components.context'
-import { EventSource } from '@hectare/platform.components.common'
+import { EventSource, EventSourceType } from '@hectare/platform.components.common'
 
 export const context_middleware = (
   store: DocumentStore
@@ -20,7 +20,8 @@ export const context_middleware = (
       payload: request.event.body,
       path: request.event.path,
       method: request.event.httpMethod.toLowerCase(),
-      headers: request.event.headers
+      headers: request.event.headers,
+      type: EventSourceType.Http
     })
 
     // assign our internal context to the Lambda context so we can use it in the handler

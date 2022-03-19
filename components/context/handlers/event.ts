@@ -1,7 +1,7 @@
 import { IDocumentStore } from 'ravendb'
 import { EventBridgeEvent } from 'aws-lambda'
 import { IContext } from '@hectare/platform.components.common'
-import { EventSource } from '@hectare/platform.components.common'
+import { EventSource, EventSourceType } from '@hectare/platform.components.common'
 import { Context } from '..'
 
 export type EventHandler = (context: Context) => Promise<void>
@@ -23,7 +23,8 @@ export const event_handler = async (
   // create internal event source instance gtom the event bridge event
   context.event = new EventSource({
     path: event['detail-type'],
-    payload: event.detail
+    payload: event.detail,
+    type: EventSourceType.Event
   })
 
   // find the handler to run based on the event-detail which is mapped to path

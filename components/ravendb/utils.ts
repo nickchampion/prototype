@@ -1,12 +1,8 @@
 /* eslint-disable no-param-reassign */
 import { PatchByQueryOperation, IDocumentQuery, QueryStatistics, IndexQuery, IDocumentStore } from 'ravendb'
 import { BaseModel, Page } from '@hectare/platform.components.common'
-import { Query } from './query'
 
 class Utils {
-  query<T extends BaseModel>(q: IDocumentQuery<T>): Query<T> {
-    return new Query<T>(q)
-  }
   async sleep(milliseconds: number): Promise<void> {
     new Promise(resolve => setTimeout(resolve, milliseconds))
   }
@@ -20,7 +16,8 @@ class Utils {
       results: res,
       total_docs: stats.totalResults,
       limit: limit,
-      offset: offset
+      offset: offset,
+      elasped: stats.durationInMs
     }
   }
   copy<TSource, TDestination>(source: TSource, destination: TDestination, ignore?: string[]): TDestination {

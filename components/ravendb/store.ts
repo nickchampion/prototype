@@ -2,6 +2,12 @@ import { DocumentStore, IAuthOptions, ObjectTypeDescriptor } from 'ravendb'
 import { configuration } from '@hectare/platform.components.configuration'
 import { BaseModel } from '@hectare/platform.components.common'
 
+/**
+ * Document store is used to configure the database and to create sessions, sessions are very lightweight, DocumentStore less so
+ * therefore a DocumentStore should be defined in the global scope so we have one instance per process
+ * @param models all domain models used by this process
+ * @returns
+ */
 export const create_document_store = (models: { [name: string]: ObjectTypeDescriptor }): DocumentStore => {
   const start = new Date().valueOf()
   const cert: IAuthOptions = {
@@ -25,7 +31,7 @@ export const create_document_store = (models: { [name: string]: ObjectTypeDescri
   // Will throw ConcurrencyError is we attempt to update a document that was updated since we loaded it
   // RavenDB does not use locking, so there may be occasions when we need to handle concurrency exceptions
   store.conventions.useOptimisticConcurrency = true
-  // This allows us to identofy the collection documents belong to by reading the private #collection field
+  // This allows us to identify the collection documents belong to by reading the private #collection field
   store.conventions.findCollectionNameForObjectLiteral = (entity: BaseModel): string => entity['#collection']
   store.initialize()
 
