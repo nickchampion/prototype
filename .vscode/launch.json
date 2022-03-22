@@ -5,17 +5,27 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Attach",
-      "port": 9001,
-      "request": "attach",
-      "type": "pwa-node"
+      "name": "Launch",
+      "type": "node",
+      "request": "launch",
+      "sourceMaps": true,
+      "runtimeArgs": [
+          "-r",
+          "ts-node/register"
+      ],
+      "args": [
+          "${workspaceFolder}/app/index.ts"
+      ]
     },
     {
+      "name": "Attach",
       "type": "node",
       "request": "attach",
-      "name": "Debug",
       "port": 9001,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "sourceMaps": true,
     }
   ]
 }
-

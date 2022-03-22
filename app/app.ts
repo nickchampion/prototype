@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-empty-function */
 import * as ctx from '@hectare/platform.components.context'
 import { create_document_store } from '@hectare/platform.components.ravendb'
 import { APIGatewayProxyEvent, Context as AwsContext } from 'aws-lambda'
