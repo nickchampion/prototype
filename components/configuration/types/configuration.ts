@@ -12,6 +12,7 @@ export interface IConfiguration {
   ravendb: IRavenDB
   modules: Record<string, unknown>
   defaults: IDefaults
+  features: Record<string, boolean>
 }
 
 export interface IDefaults {

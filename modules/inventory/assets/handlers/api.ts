@@ -1,5 +1,5 @@
 import { Response } from '@hectare/platform.components.common'
-import { ApiHandler } from '@hectare/platform.components.context'
+import { ApiHandler, VersionHandler, FeatureToggleHandler } from '@hectare/platform.components.context'
 import * as assets from '../src'
 import { AssetJson } from '../json'
 
@@ -17,7 +17,20 @@ const assets_get: ApiHandler = async (context): Promise<Response> => {
   return asset ? context.event.response.ok(asset) : context.event.response.not_found()
 }
 
+const assets_get_v2_0: ApiHandler = async (context): Promise<Response> => {
+  const asset = await assets.get(context)
+  asset.name = asset.name + ' v2.0'
+  return asset ? context.event.response.ok(asset) : context.event.response.not_found()
+}
+
 const assets_search: ApiHandler = async (context): Promise<Response> => {
+  const results = await assets.search(context)
+  return results && results.results.length
+    ? context.event.response.ok(results)
+    : context.event.response.not_found()
+}
+
+const assets_search_es: ApiHandler = async (context): Promise<Response> => {
   const results = await assets.search(context)
   return results && results.results.length
     ? context.event.response.ok(results)
@@ -30,7 +43,10 @@ const assets_create: ApiHandler = async (context): Promise<Response> => {
 }
 
 export const api_handlers: Record<string, ApiHandler> = {
-  assets_get,
-  assets_search,
+  assets_get: new VersionHandler({
+    default: assets_get,
+    v2_0: assets_get_v2_0
+  }).handle,
+  assets_search: new FeatureToggleHandler('asset_search_es', assets_search, assets_search_es).handle,
   assets_create
 }

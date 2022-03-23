@@ -1,3 +1,5 @@
 export * from './api'
 export * from './event'
 export * from './wrapper'
+export * from './versioning'
+export * from './feature'

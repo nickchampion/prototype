@@ -11,6 +11,9 @@ export const configuration = {
   defaults: {
     page_size: 25
   },
+  features: {
+    asset_search_es: true
+  },
   node_path: '.:/opt/node_modules',
   courier: {
     api_key: {

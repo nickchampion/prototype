@@ -83,7 +83,7 @@ export class Session {
    * @returns
    */
   async commit(skip_commit_actions = false): Promise<void> {
-    if (this.veto || this.database === null) return
+    if (this.veto || !this.database) return
 
     const execute_actions = async (actions: SessionAction[]) => {
       for (const action of actions) {
@@ -103,13 +103,13 @@ export class Session {
       else await this.database.saveChanges()
     } catch (e) {
       if (this._rollback_actions.length) {
-        execute_actions(this._rollback_actions)
+        await execute_actions(this._rollback_actions)
       }
       throw e
     }
 
     // run any post commit actions unless explicitly specfied not to
-    if (!skip_commit_actions) execute_actions(this._commit_actions)
+    if (!skip_commit_actions) await execute_actions(this._commit_actions)
 
     // reset
     this.database = null
