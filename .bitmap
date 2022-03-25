@@ -33,12 +33,6 @@
         "mainFile": "index.ts",
         "rootDir": "components/context"
     },
-    "components/mongodb": {
-        "scope": "hectare.platform",
-        "version": "0.0.10",
-        "mainFile": "index.ts",
-        "rootDir": "components/mongodb"
-    },
     "components/ravendb": {
         "scope": "hectare.platform",
         "version": "0.0.9",

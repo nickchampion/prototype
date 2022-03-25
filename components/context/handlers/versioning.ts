@@ -17,7 +17,7 @@ export class VersionHandler {
   }
 
   handle: ApiHandler = async (context): Promise<Response> => {
-    const api_version = context.event.headers['accept-version']?.replaceAll('.', '_')
+    const api_version = context.event.headers['accept-version']?.replace(/./g, '_')
 
     // this logic is not sufficent, we need to find the closest version match, so if we have 3 versions of this handler
     // we would use the version closest to the correct API version

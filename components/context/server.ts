@@ -1,44 +1,71 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
+import Hapi from '@hapi/hapi'
 import * as ctx from '@hectare/platform.components.context'
-import { create_document_store } from '@hectare/platform.components.ravendb'
 import { APIGatewayProxyEvent, Context as AwsContext } from 'aws-lambda'
-import * as assets from '@hectare/platform.modules.inventory.assets'
+import OpenAPIBackend from 'openapi-backend'
+import { DocumentStore } from 'ravendb'
+import { configuration } from '@hectare/platform.components.configuration'
 
-/**
- * App is our local web server so we can run all APIs at the same time locally
- * To include module APIs just import the manifest and add to the apis and models objects below
- */
-const apis = {
-  assets: assets.manifest.api
-}
+export class Server {
+  config: unknown
+  apis: Record<string, OpenAPIBackend>
+  store: DocumentStore
 
-const models = {
-  ...assets.manifest.models
-}
-
-const store = create_document_store(models)
-
-export const handler = async (req: unknown, reply: any): Promise<unknown> => {
-  // execute the handler
-  const result = await ctx.api_handler(get_aws_event(req), get_aws_context(), apis, store)
-
-  // map the response to the Hapi response
-  const response = reply.response(result.body).code(result.statusCode)
-
-  if (result.headers) {
-    Object.assign(response.headers, result.headers)
+  constructor(config: unknown, apis: Record<string, OpenAPIBackend>, store: DocumentStore) {
+    this.config = config
+    this.apis = apis
+    this.store = store
   }
 
-  if (!response.headers['content-type']) response.headers['content-type'] = 'application/json'
+  async start() {
+    // create new server instance
+    const server = new Hapi.Server(this.config)
 
-  return response
+    const handler = async (req: unknown, reply: any): Promise<unknown> => {
+      // execute the handler
+      const result = await ctx.api_handler(get_aws_event(req), get_aws_context(), this.apis, this.store)
+
+      // map the response to the Hapi response
+      const response = reply.response(result.body).code(result.statusCode)
+
+      if (result.headers) {
+        Object.assign(response.headers, result.headers)
+      }
+
+      if (!response.headers['content-type']) response.headers['content-type'] = 'application/json'
+
+      return response
+    }
+
+    server.route({
+      method: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+      path: '/{path*}',
+      config: {
+        handler: handler,
+        auth: false
+      }
+    })
+
+    async function start() {
+      await server.start()
+      return server
+    }
+
+    start()
+      .then(s => {
+        console.log(`Server listening on ${s.info.uri}`)
+      })
+      .catch(e => {
+        console.log(e)
+        process.exit(1)
+      })
+  }
 }
 
 //#region Mock AWS entities
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const get_aws_context = (): AwsContext => {
+export const get_aws_context = (): AwsContext => {
   return {
     callbackWaitsForEmptyEventLoop: null,
     functionName: null,
@@ -58,7 +85,7 @@ const get_aws_context = (): AwsContext => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const get_aws_event = (req: any): APIGatewayProxyEvent => {
+export const get_aws_event = (req: any): APIGatewayProxyEvent => {
   return {
     body: req.payload,
     headers: req.headers,

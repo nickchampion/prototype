@@ -7,15 +7,10 @@
     "node": ">=16.14.0"
   },
   "scripts": {
-    "postinstall": "bit link",
-    "postuninstall": "bit link",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --quiet",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "prettier": "prettier --write .",
     "test": "jest --watchAll --no-cache --detectOpenHandles",
-    "clean": "rm -rf build",
-    "compile": "tsc -p tsconfig.build.json",
-    "build": "npm run clean && npm run compile",
     "debug": "node --trace-warnings --inspect=0.0.0.0:9001 -r ts-node/register app/index.ts",
     "dev": "node --trace-warnings -r ts-node/register app/index.ts"
   },
